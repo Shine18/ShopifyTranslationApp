@@ -109,7 +109,7 @@ export default function Index() {
               <VerticalStack gap="5">
                 <VerticalStack gap="2">
                   <Text as="h2" variant="headingMd">
-                    Congrats on creating a new Shopify app 🎉
+                    Congrats on creating a new Shopify Translation app 🎉
                   </Text>
                   <Text variant="bodyMd" as="p">
                     This embedded app template uses{" "}

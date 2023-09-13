@@ -101,6 +101,7 @@ export default function Index() {
         <button variant="primary" onClick={generateProduct}>
           Generate a product
         </button>
+
       </ui-title-bar>
       <VerticalStack gap="5">
         <Layout>
@@ -188,6 +189,15 @@ export default function Index() {
                     App template specs
                   </Text>
                   <VerticalStack gap="2">
+                  <Divider />
+                    <HorizontalStack align="space-between">
+                      <Text as="span" variant="bodyMd">
+                        App Pages List
+                      </Text>
+                      <Link url="/app/dev">
+                        See All
+                      </Link>
+                    </HorizontalStack>
                     <Divider />
                     <HorizontalStack align="space-between">
                       <Text as="span" variant="bodyMd">

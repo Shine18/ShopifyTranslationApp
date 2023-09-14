@@ -20,3 +20,16 @@ model Session {
   accessToken String
   userId      BigInt?
 }
+
+model Shop {
+  id   Int    @id @default(autoincrement())
+  shop String
+}
+
+model Charge {
+  id              Int    @id @default(autoincrement())
+  shopifyId      String
+  confirmationUrl String
+  shop            String
+  status          String @default("unpaid")
+}

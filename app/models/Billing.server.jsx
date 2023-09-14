@@ -1,33 +1,43 @@
 import prisma from "~/db.server";
 
 export async function checkBilling(shop, graphql) {
-  // TODO: Check if shop has charge created
+  // Check if shop has charge created
   let charge = await getCharge(shop)
+  let chargeStatus = null
 
-  var a = 2
-  // TODO: IF not, create the charge and redirect the user to charge
+  // Check if current charge exists and has not been declined
+  if( charge) {
+    chargeStatus = await getChargeStatus(charge?.shopifyId, graphql)
+    updateChargeStatus(charge.id, chargeStatus)
+    if (chargeStatus === "DECLINED" ){
+      charge = null // create a new charge
+    }
+  }
+
+  // IF not, create the charge and redirect the user to charge
   if (!charge) {
     const chargeData = await createCharge(shop, graphql)
     if (chargeData) {
       charge = await saveCharge(shop, chargeData?.id, chargeData?.confirmationUrl)
+      chargeStatus = "PENDING"
     }
   }
 
 
-  // TODO: IF yes, then check if charge is paid
-  const chargeStatus = await getChargeStatus(charge?.shopifyId, graphql)
-
-
-  // TODO: IF charge is not paid, then redirect user to charge
-  if( charge &&  chargeStatus == "PENDING") {
+  // IF charge is not paid, then redirect user to charge
+  if( charge && chargeStatus == "PENDING") {
     return {
       isPaid: false,
       confirmationUrl: charge.confirmationUrl
     }
+  } else if ( chargeStatus == "ACTIVE") {
+    return {
+      isPaid: true
+    }
   }
 
   return {
-    isPaid: true
+    isPaid: false
   }
 
 }
@@ -170,6 +180,9 @@ async function getCharge(shop) {
   const charge = await prisma.charge.findFirst({
     where: {
       shop
+    },
+    orderBy: {
+      id: "desc"
     }
   })
   return charge
@@ -190,4 +203,8 @@ async function saveCharge(shop, charge_id, confirmationUrl) {
   })
   return newCharge
 
+}
+
+async function updateChargeStatus(charge_id, status){
+  // TODO: Update database to update charge status
 }

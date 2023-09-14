@@ -31,5 +31,5 @@ model Charge {
   shopifyId      String
   confirmationUrl String
   shop            String
-  status          String @default("unpaid")
+  status          String @default("PENDING")
 }

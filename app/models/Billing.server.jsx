@@ -6,10 +6,10 @@ export async function checkBilling(shop, graphql) {
   let chargeStatus = null
 
   // Check if current charge exists and has not been declined
-  if( charge) {
+  if (charge) {
     chargeStatus = await getChargeStatus(charge?.shopifyId, graphql)
     updateChargeStatus(charge.id, chargeStatus)
-    if (chargeStatus === "DECLINED" ){
+    if (chargeStatus === "DECLINED") {
       charge = null // create a new charge
     }
   }
@@ -25,12 +25,12 @@ export async function checkBilling(shop, graphql) {
 
 
   // IF charge is not paid, then redirect user to charge
-  if( charge && chargeStatus == "PENDING") {
+  if (charge && chargeStatus == "PENDING") {
     return {
       isPaid: false,
       confirmationUrl: charge.confirmationUrl
     }
-  } else if ( chargeStatus == "ACTIVE") {
+  } else if (chargeStatus == "ACTIVE") {
     return {
       isPaid: true
     }
@@ -67,12 +67,22 @@ async function createCharge(shop, graphql) {
         lineItems: [
           {
             plan: {
+              appUsagePricingDetails: {
+                terms: "Human Translation - $0.1 per word",
+                cappedAmount: {
+                  amount: 1000,
+                  currencyCode: "USD"
+                }
+              }
+            }
+          },
+          {
+            plan: {
               appRecurringPricingDetails: {
                 price: {
                   amount: 10,
                   currencyCode: "USD"
-                },
-                interval: "EVERY_30_DAYS"
+                }
               }
             }
           }
@@ -80,19 +90,19 @@ async function createCharge(shop, graphql) {
       },
     }
   );
-  const subscriptionData = await response.json()
+const subscriptionData = await response.json()
 
-  const { id } = subscriptionData?.data?.appSubscriptionCreate?.appSubscription
-  const { confirmationUrl } = subscriptionData?.data?.appSubscriptionCreate
+const { id } = subscriptionData?.data?.appSubscriptionCreate?.appSubscription
+const { confirmationUrl } = subscriptionData?.data?.appSubscriptionCreate
 
-  if (id && confirmationUrl) {
-    return {
-      id,
-      confirmationUrl
-    }
+if (id && confirmationUrl) {
+  return {
+    id,
+    confirmationUrl
   }
+}
 
-  return false
+return false
 }
 
 
@@ -205,6 +215,6 @@ async function saveCharge(shop, charge_id, confirmationUrl) {
 
 }
 
-async function updateChargeStatus(charge_id, status){
+async function updateChargeStatus(charge_id, status) {
   // TODO: Update database to update charge status
 }

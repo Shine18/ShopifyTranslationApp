@@ -24,11 +24,12 @@ model Session {
 model Shop {
   id   Int    @id @default(autoincrement())
   shop String
+  plan Int    @default(0)
 }
 
 model Charge {
   id              Int    @id @default(autoincrement())
-  shopifyId      String
+  shopifyId       String
   confirmationUrl String
   shop            String
   status          String @default("PENDING")

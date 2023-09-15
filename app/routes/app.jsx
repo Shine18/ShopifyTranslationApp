@@ -7,13 +7,18 @@ import { AppProvider } from "@shopify/shopify-app-remix/react";
 import { authenticate } from "../shopify.server";
 import { checkBilling } from "~/models/Billing.server";
 import { useEffect } from "react";
+import Shop from "~/models/Shop.server";
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export async function loader({ request }) {
   const {session, admin} = await authenticate.admin(request);
 
-  const {isPaid, confirmationUrl} = await checkBilling(session.shop, admin.graphql)
+  const shopModel = new Shop(session.shop, admin.graphql)
+  const {isPaid, confirmationUrl} = await shopModel.setupShop()
+
+
+
 
   // if( !isPaid && confirmationUrl) {
   //   return redirect(confirmationUrl)

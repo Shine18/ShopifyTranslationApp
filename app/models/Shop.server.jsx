@@ -41,13 +41,30 @@ export default class Shop {
 
   async getShop() {
     // TODO: Check if shop is in db
-
-    return null
+    const shopExist=await prisma.shop.findFirst({
+      where: {
+        shop: this.shopUrl ,
+      },
+    })
+    console.log("checking shop exist or not",shopExist);
+    return shopExist
   }
   async createShop() {
     // TODO: create shop in database with
+
+
+      const createShop=await prisma.shop.create({
+        data: {
+          shop:this.shopUrl
+        }
+      })
+
+      console.log("new shop created",createShop)
+      return createShop;
+
+
     // just pass this.shopUrl
     // TODO: return  new created shop
-    return {}
+
   }
 }

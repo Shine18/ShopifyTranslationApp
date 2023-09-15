@@ -1,19 +1,19 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-name = "ai-translation-app"
-client_id = "c354998cfc2751d121b7cc1a8cbdbdb1"
-application_url = "https://unauthorized-s-trading-functions.trycloudflare.com"
+name = "translationapp"
+client_id = "ede35f373151f4f1f9090e46213d40f8"
+application_url = "https://centers-sie-spider-titanium.trycloudflare.com"
 embedded = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+scopes = ""
 
 [auth]
 redirect_urls = [
-  "https://unauthorized-s-trading-functions.trycloudflare.com/auth/callback",
-  "https://unauthorized-s-trading-functions.trycloudflare.com/auth/shopify/callback",
-  "https://unauthorized-s-trading-functions.trycloudflare.com/api/auth/callback"
+  "https://centers-sie-spider-titanium.trycloudflare.com/auth/callback",
+  "https://centers-sie-spider-titanium.trycloudflare.com/auth/shopify/callback",
+  "https://centers-sie-spider-titanium.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
@@ -24,4 +24,4 @@ embedded = false
 
 [build]
 automatically_update_urls_on_dev = true
-dev_store_url = "translationappdev.myshopify.com"
+dev_store_url = "translationapp.myshopify.com"

@@ -2,7 +2,7 @@
 
 name = "translationapp"
 client_id = "bab053ea934eaff6d7b9f52a53e875d6"
-application_url = "https://images-setup-wifi-treating.trycloudflare.com"
+application_url = "https://game-loads-continually-chen.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -11,9 +11,9 @@ scopes = ""
 
 [auth]
 redirect_urls = [
-  "https://images-setup-wifi-treating.trycloudflare.com/auth/callback",
-  "https://images-setup-wifi-treating.trycloudflare.com/auth/shopify/callback",
-  "https://images-setup-wifi-treating.trycloudflare.com/api/auth/callback"
+  "https://game-loads-continually-chen.trycloudflare.com/auth/callback",
+  "https://game-loads-continually-chen.trycloudflare.com/auth/shopify/callback",
+  "https://game-loads-continually-chen.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

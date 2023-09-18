@@ -1,0 +1,107 @@
+.Polaris-Box{
+   
+height: 100%;
+
+margin-top:10% !important;
+
+}
+.Polaris-Box:nth-child(2){
+    border:3px solid green;
+}
+.cardtwo{
+    border:3px solid green;
+}
+.Polaris-Button{
+    width:70%;
+    border-radius: 10px;
+    height:3rem;
+}
+.buttononediv{
+ height:30%;
+ display: flex;
+ align-items: flex-end;
+ justify-content: center;
+    
+}
+.buttononedivtwo{
+    height:18%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+       
+   }
+   .buttononedivthree{
+    height:16%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+       
+   }
+   .Polaris-Grid{
+       column-gap: 0rem;
+       row-gap: 0rem;
+   }
+
+   #selectPlandiv{
+       display: grid;
+       grid-template-columns: repeat(3,1fr);
+      
+   }
+#midcard .Polaris-Text--bold{
+    color: white !important;
+}
+
+   #midcard .Polaris-Box{
+transform: translateZ(150px) !important;
+    z-index: 10;
+       height: 100%;
+       margin-top: 2% !important;
+      background: #008060;
+   }
+   #midcard .Polaris-Box .Polaris-Text--bodySm {
+color: white;
+   }
+#midcard .greychange>*{
+    
+    color: rgb(180, 178, 178) !important;
+}
+   #midcard .Polaris-Button{
+       background-color: white;
+       color: #008060;
+   }
+   #midcard .Polaris-Text--bodySm {
+       color: white;
+   }
+   .buttongroupbuttons{
+margin-top: 10%;
+       display: flex;
+       width:170%;
+       flex-direction: row !important;
+  justify-content: center !important;
+  align-items: center;
+    }
+.buttongroupbuttons  .Polaris-Button{
+width: 35%;
+height: 10% !important;
+}
+.buttongroupbuttons .Polaris-Button:nth-child(2){
+    background-color: #008060 !important;
+    color: white !important;
+}
+.buttononedivtwo{
+
+height: 5rem !important;
+}
+.exchange .Polaris-Text--bodySm {
+color: #008060;
+margin-left:20%;
+font-weight:600;
+}
+.greychange{
+    color: grey !important;
+}
+.Polaris-Text--bol{
+    font-size: 1rem !important;
+
+}
+

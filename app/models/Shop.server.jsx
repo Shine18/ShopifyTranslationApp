@@ -28,7 +28,7 @@ export default class Shop {
       shopData = await this.createShop()
     }
 
-    const billingStatus = await checkBilling(this.shop, this.graphql)
+    const billingStatus = await checkBilling(this.shopUrl, this.graphql)
 
     return {
       ...billingStatus

@@ -5,7 +5,8 @@ export default class Product {
     this.graphql = graphql;
   }
   async getProducts() {
-    const response = await this.graphql(`
+    try {
+      const response = await this.graphql(`
       query {
         products(first: 10) {
           edges {
@@ -14,39 +15,18 @@ export default class Product {
               title
               description
               handle
-              productType
-              priceRange {
-                minVariantPrice {
-                  amount
-                  currencyCode
-                }
-                maxVariantPrice {
-                  amount
-                  currencyCode
-                }
-              }
-              variants(first: 5) {
-                edges {
-                  node {
-                    id
-                    title
-                  }
-                }
-              }
-              images(first: 1) {
-                edges {
-                  node {
-                    originalSrc
-                    altText
-                  }
-                }
-              }
             }
           }
         }
       }
     `);
-  console.log("this is product data",response.data)
-    return response.data;
+      const data = await response.json()
+      console.log("this is product data", data)
+      return data;
+    }
+    catch (e) {
+      console.log("Error occurred:")
+      console.log(e)
+    }
   }
 }

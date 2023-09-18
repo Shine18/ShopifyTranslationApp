@@ -43,6 +43,7 @@ export default function App() {
           Home
         </Link>
         <Link to="/app/additional">Additional page</Link>
+        <Link to="/app/test/products">Test Products query</Link>
       </ui-nav-menu>
       <Outlet />
     </AppProvider>

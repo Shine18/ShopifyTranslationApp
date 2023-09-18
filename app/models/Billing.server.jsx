@@ -90,19 +90,19 @@ async function createCharge(shop, graphql) {
       },
     }
   );
-const subscriptionData = await response.json()
+  const subscriptionData = await response.json()
 
-const { id } = subscriptionData?.data?.appSubscriptionCreate?.appSubscription
-const { confirmationUrl } = subscriptionData?.data?.appSubscriptionCreate
+  const { id } = subscriptionData?.data?.appSubscriptionCreate?.appSubscription
+  const { confirmationUrl } = subscriptionData?.data?.appSubscriptionCreate
 
-if (id && confirmationUrl) {
-  return {
-    id,
-    confirmationUrl
+  if (id && confirmationUrl) {
+    return {
+      id,
+      confirmationUrl
+    }
   }
-}
 
-return false
+  return false
 }
 
 

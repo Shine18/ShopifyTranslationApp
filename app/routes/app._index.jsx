@@ -1,8 +1,10 @@
 import { useEffect } from "react";
-import { json } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import {
   useActionData,
   useLoaderData,
+  useLocation,
+  useNavigate,
   useNavigation,
   useSubmit,
 } from "@remix-run/react";
@@ -21,6 +23,7 @@ import {
 } from "@shopify/polaris";
 
 import { authenticate } from "../shopify.server";
+import { testBillingMutation } from "~/models/Billing.server";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
@@ -29,78 +32,111 @@ export const loader = async ({ request }) => {
 };
 
 export async function action({ request }) {
-  const { admin } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
 
-  const color = ["Red", "Orange", "Yellow", "Green"][
-    Math.floor(Math.random() * 4)
-  ];
-  const response = await admin.graphql(
-    `#graphql
-      mutation populateProduct($input: ProductInput!) {
-        productCreate(input: $input) {
-          product {
-            id
-            title
-            handle
-            status
-            variants(first: 10) {
-              edges {
-                node {
-                  id
-                  price
-                  barcode
-                  createdAt
+  const { action } = await request.json()
+
+  // console.log(body)
+  if (action == "generate") {
+    const color = ["Red", "Orange", "Yellow", "Green"][
+      Math.floor(Math.random() * 4)
+    ];
+    const response = await admin.graphql(
+      `#graphql
+        mutation populateProduct($input: ProductInput!) {
+          productCreate(input: $input) {
+            product {
+              id
+              title
+              handle
+              status
+              variants(first: 10) {
+                edges {
+                  node {
+                    id
+                    price
+                    barcode
+                    createdAt
+                  }
                 }
               }
             }
           }
-        }
-      }`,
-    {
-      variables: {
-        input: {
-          title: `${color} Snowboard`,
-          variants: [{ price: Math.random() * 100 }],
+        }`,
+      {
+        variables: {
+          input: {
+            title: `${color} Snowboard`,
+            variants: [{ price: Math.random() * 100 }],
+          },
         },
-      },
+      }
+    );
+
+    const responseJson = await response.json();
+
+    return json({
+      product: responseJson.data.productCreate.product,
+    });
+  }
+  else if (action == "testBilling") {
+    const billing = await testBillingMutation(session.shop, admin.graphql)
+    if( billing?.chargeURL) {
+      return json({
+        chargeUrl: billing.chargeURL
+      })
     }
-  );
 
-  const responseJson = await response.json();
 
-  return json({
-    product: responseJson.data.productCreate.product,
-  });
+  }
+
 }
 
 export default function Index() {
   const nav = useNavigation();
+
   const { shop } = useLoaderData();
   const actionData = useActionData();
   const submit = useSubmit();
 
-  const isLoading =
-    ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
+  console.log(actionData)
+  const isLoading =false
+    // ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
 
   const productId = actionData?.product?.id.replace(
     "gid://shopify/Product/",
     ""
   );
 
+  const billingUrl = actionData?.chargeUrl
+
   useEffect(() => {
     if (productId) {
       shopify.toast.show("Product created");
     }
+
   }, [productId]);
 
-  const generateProduct = () => submit({}, { replace: true, method: "POST" });
 
+
+  useEffect(() => {
+    if (billingUrl) {
+      open(billingUrl, "_top")
+    }
+
+  }, [billingUrl]);
+
+
+
+  const generateProduct = () => submit({ action: "generate" }, { replace: true, method: "POST", encType: "application/json" });
+  const testBilling = () => submit({ action: "testBilling" }, { replace: true, method: "POST", encType: "application/json" })
   return (
     <Page>
       <ui-title-bar title="Remix app template">
         <button variant="primary" onClick={generateProduct}>
           Generate a product
         </button>
+
 
       </ui-title-bar>
       <VerticalStack gap="5">
@@ -163,6 +199,9 @@ export default function Index() {
                   <Button loading={isLoading} primary onClick={generateProduct}>
                     Generate a product
                   </Button>
+                  <Button primary onClick={testBilling}>
+                    Test Billing
+                  </Button>
                 </HorizontalStack>
                 {actionData?.product && (
                   <Box
@@ -189,7 +228,7 @@ export default function Index() {
                     App template specs
                   </Text>
                   <VerticalStack gap="2">
-                  <Divider />
+                    <Divider />
                     <HorizontalStack align="space-between">
                       <Text as="span" variant="bodyMd">
                         App Pages List

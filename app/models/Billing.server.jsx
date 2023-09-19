@@ -2,66 +2,53 @@ import prisma from "~/db.server";
 
 export async function checkBilling(shop, graphql) {
   // Check if shop has charge created
-  let charge = await getCharge(shop);
-  let chargeStatus = null;
+  let charge = await getCharge(shop)
+  let chargeStatus = null
 
   // Check if current charge exists and has not been declined
-  if (charge) {
-    chargeStatus = await getChargeStatus(charge?.shopifyId, graphql);
-    updateChargeStatus(charge.id, chargeStatus);
-    if (chargeStatus === "DECLINED") {
-      charge = null; // create a new charge
+  if( charge) {
+    chargeStatus = await getChargeStatus(charge?.shopifyId, graphql)
+    updateChargeStatus(charge.id, chargeStatus)
+    if (chargeStatus === "DECLINED" ){
+      charge = null // create a new charge
     }
   }
 
   // IF not, create the charge and redirect the user to charge
   if (!charge) {
-    const chargeData = await createCharge(shop, graphql);
+    const chargeData = await createCharge(shop, graphql)
     if (chargeData) {
-      charge = await saveCharge(
-        shop,
-        chargeData?.id,
-        chargeData?.confirmationUrl
-      );
-      chargeStatus = "PENDING";
+      charge = await saveCharge(shop, chargeData?.id, chargeData?.confirmationUrl)
+      chargeStatus = "PENDING"
     }
   }
 
+
   // IF charge is not paid, then redirect user to charge
-  if (charge && chargeStatus == "PENDING") {
+  if( charge && chargeStatus == "PENDING") {
     return {
       isPaid: false,
-      confirmationUrl: charge.confirmationUrl,
-    };
-  } else if (chargeStatus == "ACTIVE") {
+      confirmationUrl: charge.confirmationUrl
+    }
+  } else if ( chargeStatus == "ACTIVE") {
     return {
-      isPaid: true,
-    };
+      isPaid: true
+    }
   }
 
   return {
-    isPaid: false,
-  };
+    isPaid: false
+  }
+
 }
 
 async function createCharge(shop, graphql) {
-  const { SHOPIFY_API_KEY } = process.env;
-  const returnURl = `https://${shop}/admin/apps/${SHOPIFY_API_KEY}`;
+  const { SHOPIFY_API_KEY } = process.env
+  const returnURl = `https://${shop}/admin/apps/${SHOPIFY_API_KEY}`
   const response = await graphql(
-    `
-      #graphql
-      mutation appSubscriptionCreate(
-        $lineItems: [AppSubscriptionLineItemInput!]!
-        $name: String!
-        $returnUrl: URL!
-        $test: Boolean
-      ) {
-        appSubscriptionCreate(
-          lineItems: $lineItems
-          name: $name
-          returnUrl: $returnUrl
-          test: $test
-        ) {
+    `#graphql
+      mutation appSubscriptionCreate($lineItems: [AppSubscriptionLineItemInput!]!, $name: String!, $returnUrl: URL!, $test: Boolean) {
+        appSubscriptionCreate(lineItems: $lineItems, name: $name, returnUrl: $returnUrl, test: $test) {
           appSubscription {
             id
           }
@@ -71,8 +58,7 @@ async function createCharge(shop, graphql) {
             message
           }
         }
-      }
-    `,
+      }`,
     {
       variables: {
         name: "Test Plan",
@@ -84,49 +70,39 @@ async function createCharge(shop, graphql) {
               appRecurringPricingDetails: {
                 price: {
                   amount: 10,
-                  currencyCode: "USD",
+                  currencyCode: "USD"
                 },
-                interval: "EVERY_30_DAYS",
-              },
-            },
-          },
-        ],
+                interval: "EVERY_30_DAYS"
+              }
+            }
+          }
+        ]
       },
     }
   );
-  const subscriptionData = await response.json();
+  const subscriptionData = await response.json()
 
-  const { id } = subscriptionData?.data?.appSubscriptionCreate?.appSubscription;
-  const { confirmationUrl } = subscriptionData?.data?.appSubscriptionCreate;
+  const { id } = subscriptionData?.data?.appSubscriptionCreate?.appSubscription
+  const { confirmationUrl } = subscriptionData?.data?.appSubscriptionCreate
 
   if (id && confirmationUrl) {
     return {
       id,
-      confirmationUrl,
-    };
+      confirmationUrl
+    }
   }
 
-  return false;
+  return false
 }
 
+
 export async function testBillingMutation(shop, graphql) {
-  const { SHOPIFY_API_KEY } = process.env;
-  const returnURl = `https://${shop}/admin/apps/${SHOPIFY_API_KEY}`;
+  const { SHOPIFY_API_KEY } = process.env
+  const returnURl = `https://${shop}/admin/apps/${SHOPIFY_API_KEY}`
   const response = await graphql(
-    `
-      #graphql
-      mutation appSubscriptionCreate(
-        $lineItems: [AppSubscriptionLineItemInput!]!
-        $name: String!
-        $returnUrl: URL!
-        $test: Boolean
-      ) {
-        appSubscriptionCreate(
-          lineItems: $lineItems
-          name: $name
-          returnUrl: $returnUrl
-          test: $test
-        ) {
+    `#graphql
+      mutation appSubscriptionCreate($lineItems: [AppSubscriptionLineItemInput!]!, $name: String!, $returnUrl: URL!, $test: Boolean) {
+        appSubscriptionCreate(lineItems: $lineItems, name: $name, returnUrl: $returnUrl, test: $test) {
           appSubscription {
             id
           }
@@ -136,8 +112,7 @@ export async function testBillingMutation(shop, graphql) {
             message
           }
         }
-      }
-    `,
+      }`,
     {
       variables: {
         name: "Test Plan",
@@ -149,30 +124,32 @@ export async function testBillingMutation(shop, graphql) {
               appRecurringPricingDetails: {
                 price: {
                   amount: 10,
-                  currencyCode: "USD",
+                  currencyCode: "USD"
                 },
-                interval: "EVERY_30_DAYS",
-              },
-            },
-          },
-        ],
+                interval: "EVERY_30_DAYS"
+              }
+            }
+          }
+        ]
       },
     }
   );
-  const subscriptionData = await response.json();
+  const subscriptionData = await response.json()
 
-  const { id } = subscriptionData?.data?.appSubscriptionCreate?.appSubscription;
-  const { confirmationUrl } = subscriptionData?.data?.appSubscriptionCreate;
+  const { id } = subscriptionData?.data?.appSubscriptionCreate?.appSubscription
+  const { confirmationUrl } = subscriptionData?.data?.appSubscriptionCreate
 
   if (id && confirmationUrl) {
-    saveCharge(shop, id, confirmationUrl);
+    saveCharge(shop, id, confirmationUrl)
     return {
-      chargeURL: subscriptionData.data?.appSubscriptionCreate?.confirmationUrl,
-    };
+      chargeURL: subscriptionData.data?.appSubscriptionCreate?.confirmationUrl
+    }
   }
 
-  return false;
+  return false
 }
+
+
 
 async function getChargeStatus(chargeId, graphql) {
   try {
@@ -187,26 +164,28 @@ async function getChargeStatus(chargeId, graphql) {
             }
           }
         }`
-    );
-    const charge = await response.json();
+    )
+    const charge = await response.json()
 
-    return charge?.data?.node?.status;
-  } catch (e) {
-    console.log(e);
-    return false;
+    return charge?.data?.node?.status
   }
+  catch (e) {
+    console.log(e)
+    return false
+  }
+
 }
 
 async function getCharge(shop) {
   const charge = await prisma.charge.findFirst({
     where: {
-      shop,
+      shop
     },
     orderBy: {
-      id: "desc",
-    },
-  });
-  return charge;
+      id: "desc"
+    }
+  })
+  return charge
 }
 
 async function saveCharge(shop, charge_id, confirmationUrl) {
@@ -219,21 +198,13 @@ async function saveCharge(shop, charge_id, confirmationUrl) {
     data: {
       confirmationUrl,
       shopifyId: charge_id,
-      shop,
-    },
-  });
-  return newCharge;
+      shop
+    }
+  })
+  return newCharge
+
 }
 
-async function updateChargeStatus(charge_id, status) {
+async function updateChargeStatus(charge_id, status){
   // TODO: Update database to update charge status
-  const updateCharge = await prisma.charge.update({
-    where: {
-      id: charge_id,
-    },
-    data: {
-      status: status,
-    },
-  });
-  return updateCharge;
 }

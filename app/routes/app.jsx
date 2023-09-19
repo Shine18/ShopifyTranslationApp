@@ -5,19 +5,16 @@ import { boundary } from "@shopify/shopify-app-remix/server";
 import { AppProvider } from "@shopify/shopify-app-remix/react";
 
 import { authenticate } from "../shopify.server";
-import { checkBilling } from "~/models/Billing.server";
 import { useEffect } from "react";
+import Shop from "~/models/Shop.server";
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export async function loader({ request }) {
   const {session, admin} = await authenticate.admin(request);
 
-  const {isPaid, confirmationUrl} = await checkBilling(session.shop, admin.graphql)
-
-  // if( !isPaid && confirmationUrl) {
-  //   return redirect(confirmationUrl)
-  // }
+  const shopModel = new Shop(session.shop, admin.graphql)
+  const {isPaid, confirmationUrl} = await shopModel.setupShop()
 
   return json({ apiKey: process.env.SHOPIFY_API_KEY, isPaid, confirmationUrl });
 }
@@ -38,6 +35,7 @@ export default function App() {
           Home
         </Link>
         <Link to="/app/additional">Additional page</Link>
+        <Link to="/app/selectPlan">Test: Select Plan page</Link>
       </ui-nav-menu>
       <Outlet />
     </AppProvider>

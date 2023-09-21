@@ -15,6 +15,11 @@ const pages = [
     filename: "app.selectPlan.jsx",
     url: "/app/selectPlan",
     status: <Badge progress="incomplete">In Dev</Badge>
+  },{
+    title:'select language screen',
+    filename:'app.languageselection',
+    url:'/app/languageselection',
+    status:<Badge progress="incomplete">In DEV</Badge>
   }
 ]
 

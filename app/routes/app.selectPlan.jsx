@@ -1,23 +1,79 @@
 
 import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
-import { Page,Grid,ButtonGroup, Button,Card,Text,HorizontalStack,VerticalStack } from "@shopify/polaris";
+import { Button, Page,Grid,ButtonGroup,Card,Text,HorizontalStack,VerticalStack } from "@shopify/polaris";
+import Shop, { PLANS } from "~/models/Shop.server";
+import { useActionData, useLoaderData, useSubmit } from "@remix-run/react";
+import { useCallback, useEffect } from "react";
+
+
+const ACTIONS = {
+  ChangePlan: "change-plan"
+}
 import styles from '~/styles/selectPlan.css';
 export const links = () => [{ rel: "stylesheet", href: styles }];
 
 export const loader = async ({ request }) => {
-  
-  const { session } = await authenticate.admin(request);
 
-  return json({ shop: session.shop.replace(".myshopify.com", "") });
+  const { session, admin } = await authenticate.admin(request);
+  const shop = new Shop(session.shop, admin.graphql)
+
+  const plan = await shop.getCurrentPlan()
+  return json({
+    shop: session.shop.replace(".myshopify.com", ""),
+    currentPlan: plan,
+    PLANS
+  });
 };
 
 
+export async function action({ request }) {
+  const {session, admin } = await authenticate.admin(request);
+  const shop = new Shop(session.shop, admin.graphql)
+
+  const { action, toPlan } = await request.json()
+
+  // console.log(body)
+  if (action == ACTIONS.ChangePlan) {
+    const newPlan = PLANS.find(plan => plan.id === toPlan )
+    const newPlanData = await shop.changePlan(newPlan)
+    return json({
+      newPlan
+    });
+  }
+
+}
+
+
 export default function SelectPlanRoute() {
+  const { currentPlan, PLANS } = useLoaderData()
+  const actionData = useActionData()
+
+  const submit = useSubmit()
+
+  // incoming server's action response
+  const newPlan = actionData?.newPlan
+  useEffect( () => {
+    if( newPlan) {
+      shopify.toast.show(`Plan changed to ${newPlan.title}`)
+    }
+  }, [newPlan])
+
+
+
+  const changePlan = (to) => submit({ action: ACTIONS.ChangePlan, toPlan: to }, { replace: true, method: "POST", encType: "application/json" });
 
   return <Page>
-    <ui-title-bar title="Dev Pages List" />
-    {/* add your code here */}
+    <ui-title-bar title="Test: Select Plan Page" />
+
+    <Text as="h4">Current Plan: {currentPlan.title}</Text>
+
+    {PLANS.map(plan => {
+      return <Button onClick={() => {
+        changePlan(plan.id)
+      }} key={plan.id} primary disabled={plan.id == currentPlan.id}>Change to {plan.title}</Button>
+    })}
+
     <div id="selectPlandiv">
    <div>
       <Card id="cardd" title="Sales" sectioned>
@@ -31,7 +87,7 @@ export default function SelectPlanRoute() {
       </Text>
 </div>
       <Text width="206px" fontWeight="bold" variant="heading3xl" alignment="start" as="h1">
-        0 
+        0
       </Text>
       <VerticalStack align="end">
   <div className="greychange">
@@ -55,7 +111,7 @@ export default function SelectPlanRoute() {
           <svg width="25" height="20" viewBox="0 -0.5 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5.5 12.5L10.167 17L19.5 8" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
   <Text variant="bodySm" alignment="start" as="p">
         Google workspace,
-        
+
       </Text>
 </div>
      <div className="exchange">
@@ -135,9 +191,9 @@ export default function SelectPlanRoute() {
   <svg width="25" height="20" viewBox="0 -0.5 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#fafafa"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5.5 12.5L10.167 17L19.5 8" stroke="#fffafa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
   <Text variant="bodySm" alignment="start" as="p">
         Google workspace,  Exchange?
-        
+
       </Text>
-</div>  
+</div>
   </VerticalStack>
   <div style={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'center'}}>
   <svg width="25" height="20" viewBox="0 -0.5 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#fafafa"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5.5 12.5L10.167 17L19.5 8" stroke="#fffafa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
@@ -216,11 +272,11 @@ export default function SelectPlanRoute() {
           <svg width="25" height="20" viewBox="0 -0.5 25 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5.5 12.5L10.167 17L19.5 8" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
   <Text variant="bodySm" alignment="start" as="p">
         Google workspace,
-        
+
       </Text>
 </div>
     <div className="exchange">
-    
+
     <Text variant="bodySm" alignment="start" as="p">
         Exchange?
       </Text>

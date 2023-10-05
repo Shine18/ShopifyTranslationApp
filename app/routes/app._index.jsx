@@ -24,17 +24,23 @@ import {
 
 import { authenticate } from "../shopify.server";
 import { testBillingMutation } from "~/models/Billing.server";
+import Shop from "~/models/Shop.server";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
+  const shopobj = new Shop();
+  const plancheck = await shopobj.getCurrentPlan();
 
-  return json({ shop: session.shop.replace(".myshopify.com", "") });
+  return json({
+    shop: session.shop.replace(".myshopify.com", ""),
+    currentPlan: plancheck,
+  });
 };
 
 export async function action({ request }) {
   const { admin, session } = await authenticate.admin(request);
 
-  const { action } = await request.json()
+  const { action } = await request.json();
 
   // console.log(body)
   if (action == "generate") {
@@ -78,66 +84,65 @@ export async function action({ request }) {
     return json({
       product: responseJson.data.productCreate.product,
     });
-  }
-  else if (action == "testBilling") {
-    const billing = await testBillingMutation(session.shop, admin.graphql)
-    if( billing?.chargeURL) {
+  } else if (action == "testBilling") {
+    const billing = await testBillingMutation(session.shop, admin.graphql);
+    if (billing?.chargeURL) {
       return json({
-        chargeUrl: billing.chargeURL
-      })
+        chargeUrl: billing.chargeURL,
+      });
     }
-
-
   }
-
 }
 
 export default function Index() {
   const nav = useNavigation();
 
-  const { shop } = useLoaderData();
+  const { shop, currentPlan } = useLoaderData();
   const actionData = useActionData();
   const submit = useSubmit();
 
-  console.log(actionData)
-  const isLoading =false
-    // ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
+  console.log(actionData);
+  console.log("current plan is ", currentPlan);
+  const isLoading = false;
+  // ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
 
   const productId = actionData?.product?.id.replace(
     "gid://shopify/Product/",
     ""
   );
 
-  const billingUrl = actionData?.chargeUrl
-
+  const billingUrl = actionData?.chargeUrl;
+  useEffect(() => {
+    if (!currentPlan) redirect("/selectPlan");
+  }, [currentPlan]);
   useEffect(() => {
     if (productId) {
       shopify.toast.show("Product created");
     }
-
   }, [productId]);
-
-
 
   useEffect(() => {
     if (billingUrl) {
-      open(billingUrl, "_top")
+      open(billingUrl, "_top");
     }
-
   }, [billingUrl]);
 
-
-
-  const generateProduct = () => submit({ action: "generate" }, { replace: true, method: "POST", encType: "application/json" });
-  const testBilling = () => submit({ action: "testBilling" }, { replace: true, method: "POST", encType: "application/json" })
+  const generateProduct = () =>
+    submit(
+      { action: "generate" },
+      { replace: true, method: "POST", encType: "application/json" }
+    );
+  const testBilling = () =>
+    submit(
+      { action: "testBilling" },
+      { replace: true, method: "POST", encType: "application/json" }
+    );
   return (
     <Page>
       <ui-title-bar title="Remix app template">
         <button variant="primary" onClick={generateProduct}>
           Generate a product
         </button>
-
-
       </ui-title-bar>
       <VerticalStack gap="5">
         <Layout>
@@ -233,9 +238,7 @@ export default function Index() {
                       <Text as="span" variant="bodyMd">
                         App Pages List
                       </Text>
-                      <Link url="/app/dev">
-                        See All
-                      </Link>
+                      <Link url="/app/dev">See All</Link>
                     </HorizontalStack>
                     <Divider />
                     <HorizontalStack align="space-between">

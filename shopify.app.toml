@@ -1,0 +1,27 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "translationappmf"
+client_id = "138e1cce5b96d7573dbf5afcb607f166"
+application_url = "https://tag-marketing-hint-beings.trycloudflare.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products,write_products"
+
+[auth]
+redirect_urls = [
+  "https://tag-marketing-hint-beings.trycloudflare.com/auth/callback",
+  "https://tag-marketing-hint-beings.trycloudflare.com/auth/shopify/callback",
+  "https://tag-marketing-hint-beings.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2023-07"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "translationapp.myshopify.com"

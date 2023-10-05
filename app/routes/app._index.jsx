@@ -95,7 +95,7 @@ export async function action({ request }) {
 }
 
 export default function Index() {
-  const nav = useNavigation();
+  const navigate = useNavigate();
 
   const { shop, currentPlan } = useLoaderData();
   const actionData = useActionData();
@@ -105,16 +105,18 @@ export default function Index() {
   console.log("current plan is ", currentPlan);
   const isLoading = false;
   // ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
-
+  useEffect(() => {
+    if (!currentPlan) {
+      console.log("run this shit");
+      navigate("/app/selectPlan");
+    }
+  },[]);
   const productId = actionData?.product?.id.replace(
     "gid://shopify/Product/",
     ""
   );
 
   const billingUrl = actionData?.chargeUrl;
-  useEffect(() => {
-    if (!currentPlan) redirect("/selectPlan");
-  }, [currentPlan]);
   useEffect(() => {
     if (productId) {
       shopify.toast.show("Product created");

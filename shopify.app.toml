@@ -2,7 +2,7 @@
 
 name = "translationappmf"
 client_id = "138e1cce5b96d7573dbf5afcb607f166"
-application_url = "https://tag-marketing-hint-beings.trycloudflare.com"
+application_url = "https://forwarding-divided-timeline-welding.trycloudflare.com"
 embedded = true
 
 [access_scopes]
@@ -11,9 +11,9 @@ scopes = "read_products,write_products"
 
 [auth]
 redirect_urls = [
-  "https://tag-marketing-hint-beings.trycloudflare.com/auth/callback",
-  "https://tag-marketing-hint-beings.trycloudflare.com/auth/shopify/callback",
-  "https://tag-marketing-hint-beings.trycloudflare.com/api/auth/callback"
+  "https://forwarding-divided-timeline-welding.trycloudflare.com/auth/callback",
+  "https://forwarding-divided-timeline-welding.trycloudflare.com/auth/shopify/callback",
+  "https://forwarding-divided-timeline-welding.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

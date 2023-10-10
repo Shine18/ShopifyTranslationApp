@@ -111,4 +111,19 @@ export default class Shop {
     return createShop;
 
   }
+  async addLanguages(base,target){
+    await this.getShop()
+    if(this.shop){
+      const storeLanguage=await prisma.shop.update({
+        where: {
+          id: this.shop.id
+        },
+        data:{
+          baseLanguageCode:base,
+          TargetLanguagesCode:target.toString()
+        }
+      })
+      return storeLanguage
+    }
+  }
 }

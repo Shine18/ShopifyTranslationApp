@@ -107,7 +107,7 @@ export default function Index() {
   // ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
   useEffect(() => {
     if (!currentPlan) {
-      console.log("run this shit");
+
       navigate("/app/selectPlan");
     }
   },[]);

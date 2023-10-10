@@ -66,13 +66,13 @@ export default function SelectPlanRoute() {
   return <Page>
     <ui-title-bar title="Test: Select Plan Page" />
 
-    <Text as="h4">Current Plan: {currentPlan.title}</Text>
+    <Text as="h4">Current Plan: {currentPlan ? currentPlan.title : "No Plan Selected" }</Text>
 
-    {PLANS.map(plan => {
+    {/* {PLANS.map(plan => {
       return <Button onClick={() => {
         changePlan(plan.id)
-      }} key={plan.id} primary disabled={plan.id == currentPlan.id}>Change to {plan.title}</Button>
-    })}
+      }} key={plan.id} primary disabled={currentPlan ? plan.id == currentPlan.id : false}>Change to {plan.title}</Button>
+    })} */}
 
     <div id="selectPlandiv">
       <div>
@@ -146,7 +146,11 @@ export default function SelectPlanRoute() {
             </div>
           </VerticalStack>
           <div class="buttononediv">
-            <Button textAlign="center" primary="true">Get free</Button>
+            <Button textAlign="center" primary="true"
+            onClick={() => {
+              changePlan(PLANS[0].id)
+            }}
+            disabled={currentPlan ? PLANS[0].id == currentPlan.id : false} >Get Free</Button>
           </div>
         </Card>
       </div>
@@ -233,7 +237,11 @@ export default function SelectPlanRoute() {
               </div>
             </VerticalStack>
             <div class="buttononedivtwo">
-              <Button textAlign="center" primary="true">Get free</Button>
+              <Button textAlign="center" primary="true"
+              onClick={() => {
+                changePlan(PLANS[1].id)
+              }}
+              disabled={currentPlan ? PLANS[1].id == currentPlan.id : false}>Get Standard</Button>
             </div>
           </div>
         </Card>
@@ -321,7 +329,11 @@ export default function SelectPlanRoute() {
             </div>
           </VerticalStack>
           <div className="buttononedivthree">
-            <Button textAlign="center" primary="true">Get free</Button>
+            <Button textAlign="center" primary="true"
+            onClick={() => {
+              changePlan(PLANS[2].id)
+            }}
+            disabled={currentPlan ? PLANS[2].id == currentPlan.id : false}>Get Advanced</Button>
           </div>
         </Card>
       </div>

@@ -1,9 +1,9 @@
 import { json, redirect } from "@remix-run/node";
-import { Link, Outlet, useLoaderData, useRouteError } from "@remix-run/react";
+
+import { Link, Outlet, useLoaderData, useRouteError,useNavigate } from "@remix-run/react";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css";
 import { boundary } from "@shopify/shopify-app-remix/server";
 import { AppProvider } from "@shopify/shopify-app-remix/react";
-
 import { authenticate } from "../shopify.server";
 import { useEffect } from "react";
 import Shop from "~/models/Shop.server";
@@ -11,22 +11,33 @@ import Shop from "~/models/Shop.server";
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
 export async function loader({ request }) {
-  const {session, admin} = await authenticate.admin(request);
+  const { session, admin } = await authenticate.admin(request);
 
-  const shopModel = new Shop(session.shop, admin.graphql)
-  const {isPaid, confirmationUrl} = await shopModel.setupShop()
+  const shopModel = new Shop(session.shop, admin.graphql);
+  const { isPaid, confirmationUrl, isNewShop } = await shopModel.setupShop();
 
-  return json({ apiKey: process.env.SHOPIFY_API_KEY, isPaid, confirmationUrl });
+  return json({
+    apiKey: process.env.SHOPIFY_API_KEY,
+    isPaid,
+    confirmationUrl,
+    isNewShop,
+  });
 }
 
 export default function App() {
-  const { apiKey, isPaid, confirmationUrl } = useLoaderData();
+  const navigate=useNavigate();
+  const { apiKey, isPaid, confirmationUrl, isNewShop } = useLoaderData();
+
+    if (isNewShop) {
+      console.log("new shop",isNewShop)
+      navigate("/selectPlan");
+    }
 
   useEffect(() => {
-    if( !isPaid && confirmationUrl) {
-      open(confirmationUrl, "_top")
+    if (!isPaid && confirmationUrl) {
+      open(confirmationUrl, "_top");
     }
-  }, [ isPaid, confirmationUrl])
+  }, [isPaid, confirmationUrl]);
 
   return (
     <AppProvider isEmbeddedApp apiKey={apiKey}>

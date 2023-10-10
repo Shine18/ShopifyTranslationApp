@@ -43,7 +43,11 @@ export default class Shop {
     const currentPlan = await this.getCurrentPlan()
     if (currentPlan?.id === 0) {
       billingStatus = { isPaid: true }
-    } else {
+    }else if(currentPlan==null){
+
+      billingStatus= {iseNewShop:true}
+    }
+     else {
       billingStatus = await checkBilling(this.shopUrl, this.graphql, currentPlan)
     }
 

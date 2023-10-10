@@ -1,0 +1,40 @@
+.Polaris-HorizontalStack{
+   
+    gap:1rem;
+}
+.Polaris-Text--headingMd{
+    padding-top:0.5rem;
+}
+
+.Polaris-Text--regular{
+    padding-top: 0.5rem;
+}
+#totalbutton .Polaris-Button--primary{
+    width:6.5rem;
+}
+#totalbutton{
+   display: flex;
+   flex-direction: column;
+   gap:0.5rem;
+ 
+   align-items: flex-end;
+    width:100%;
+   
+}
+#secondcard{
+    margin-top: 3rem;
+}
+span{
+    font-weight: bold;
+}
+.Polaris-Text--subdued{
+    font-weight: normal;
+}
+#secondcardbutton{
+    width:100%;
+    display: flex;
+    justify-content: flex-end;
+}
+#secondcardbutton .Polaris-Button--primary{
+    width:6rem;
+}

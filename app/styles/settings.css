@@ -1,0 +1,37 @@
+#firstcardupdate{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+#firstcardupdate .Polaris-Button{
+    width: 7rem;
+}
+#firstcardfirstsection .Polaris-Checkbox__Backdrop:before{
+    background-color: #008060;
+}
+#firstcardfirstsection{
+    padding-top: 0.5rem;
+}
+#firstcardsecondsection{
+    padding-top: 0.5rem;
+}
+#firstcardfirstsection .Polaris-Text--root{
+    padding-top: 0.3rem;
+}
+#firstcardsecondsection .Polaris-Text--root{
+    padding-top: 0.3rem;
+}
+#tags{
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+}
+
+#secondcarddiv{
+    margin-top: 0.5rem;
+}
+#lastselect{
+    width: 20%;
+
+}

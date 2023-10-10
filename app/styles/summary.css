@@ -1,0 +1,27 @@
+.selectedcard{
+    border-radius: 2px;
+    color: white;
+background: #008060;
+width:4rem;
+text-align: center;
+}
+.Polaris-HorizontalStack{
+    gap:0.5rem;
+}
+#secondcard{
+ margin-top:  0.5rem;   
+}
+.Polaris-Checkbox__Backdrop:before{
+    background-color: #008060;
+}
+#secondcardbutton{
+    width:100%;
+    display: flex;
+    justify-content: flex-end;
+}
+#secondcardbutton .Polaris-Button--primary{
+    width:6rem;
+}
+.Polaris-DataTable__Cell--header,.Polaris-DataTable--cellTotalFooter:first-child{
+    font-weight: bold !important;
+}

@@ -1,0 +1,68 @@
+#firstcheckbox{
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+}
+.Polaris-Checkbox__Backdrop:before{
+    background-color: #008060;
+}
+.Polaris-Box{
+    width:100%;
+
+}
+.cardimage{
+    width: 152%;
+    object-fit: cover;
+    margin-top: -24%;
+}
+.cardimageholder{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#grid {
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    grid-template-rows: repeat(2,1fr);
+    grid-gap: 10px;
+    padding: 20px;
+    align-items: center;
+    justify-items: center;
+    grid-auto-flow: row;
+    box-sizing: border-box;
+}
+.lastcardbutton{
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    gap: 1rem;
+    align-items: center;
+
+}
+.lastcardbutton .Polaris-Text--root{
+    text-decoration: underline;
+   
+    color: #2C6ECB;
+}
+.lastcardbutton .Polaris-Button{
+    width:7rem;
+}
+#lastdiv{
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    align-items: center;
+    flex-direction: row;
+    gap: 10rem;
+}
+#anotherdiv{
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 62%;
+}
+
+#anotherdiv .Polaris-Button--primary{
+    width: 7rem;
+}

@@ -15,6 +15,7 @@ import {
   Text,
   HorizontalStack,
   VerticalStack,
+  LegacyStack,
 } from "@shopify/polaris";
 import styles from "~/styles/languageselection.css";
 import { useActionData, useSubmit } from "@remix-run/react";
@@ -69,7 +70,7 @@ export default function languageselection() {
 
   const activator = (
     <Button onClick={togglePopoverActive} disclosure>
-      Options
+      Target Language
     </Button>
   );
   const handleRemove = useCallback(
@@ -129,6 +130,7 @@ export default function languageselection() {
       <div id="cardwith2select">
         <Card>
           <div id="selectiondivs">
+            <LegacyStack spacing="4">
             <Select
               options={options}
               onChange={handleSelectChange}
@@ -152,6 +154,7 @@ export default function languageselection() {
                 </Popover>
               </div>
             </VerticalStack>
+            </LegacyStack>
           </div>
 
           {selected !== "Base language" && (

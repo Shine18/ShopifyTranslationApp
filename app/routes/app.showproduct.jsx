@@ -1,193 +1,88 @@
-import React from 'react'
-import { DataTable,Card, Text,Checkbox, IndexTable,Pagination, Page, Badge,Tag,HorizontalStack, VerticalStack,Button,ChoiceList } from "@shopify/polaris";
-import styles from '~/styles/showproduct.css';
-import {useState, useCallback} from 'react';
+import {
+  Card,
+  Text,
+  Checkbox,
+  Pagination,
+  Page,
+  Button,
+  Link
+} from "@shopify/polaris";
+import styles from "~/styles/showproduct.css";
+import { useState, useCallback, useEffect } from "react";
+import Product from "~/models/Products.server";
+import { json } from "@remix-run/node";
+import { authenticate } from "../shopify.server";
+import { useLoaderData } from "@remix-run/react";
 export const links = () => [{ rel: "stylesheet", href: styles }];
-const showproduct=()=>{
-    const [checked, setChecked] = useState(false);
-    const handleChange = useCallback(
-      (newChecked) => setChecked(newChecked),
-      [],
-    );
-    return(
-        <Page>
-<div id="firstcheckbox">
-<Checkbox
-      label="Select All"
-      checked={checked}
-      onChange={handleChange}
-    />
-</div>
-<div id="grid">
-<Card>
-  <div className="cardimageholder">
-  <img className="cardimage" src="https://s3-alpha-sig.figma.com/img/9824/f33c/76647abb61891fe13da188ea01dbbb9d?Expires=1697414400&Signature=qjApYRx4npnAzwStxN4gThkhyqCjiaUQ00fNZ2FpGORRBbkxuqGcZoaRPRlNC2RVoeV0QLLLUeVgD03dLuWX2wS~j-UpSQF3HASGqa3LSV15xlRWtzu09EjWRa~fND1kv9nqO92DWgKf1IA5ZFw7pgGLX-zQBfqaf2AXeTjaaPWWEdTPGOLElJ55Y6vjguqjPgNLXixLtpEuS~qWW-gmfFJknImBAi651nHCBi2GWqbEnmWgc9baa3q-Kk1q5ebx-odqVEaDUgCQGWpKWa0qE~l5OpZ3Z4oJNZ6thCBr8qeGbF9ujpVM~xdMGbFz6jh7KCjjBNElXdbL-bYJov7AwA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4">
-    </img>
-  </div>
-    <Text fontWeight="bold" variant="headingSm">Validate your product and the market</Text>
-<Text>URL</Text>
-<Text>www.atlrux.com</Text>
-<div className="lastcardbutton">
-    <Button>
-        Select
-    </Button>
-<Text>View</Text>
-</div>
-</Card>
-<Card>
-  <div className="cardimageholder">
-  <img className="cardimage" src="https://s3-alpha-sig.figma.com/img/9824/f33c/76647abb61891fe13da188ea01dbbb9d?Expires=1697414400&Signature=qjApYRx4npnAzwStxN4gThkhyqCjiaUQ00fNZ2FpGORRBbkxuqGcZoaRPRlNC2RVoeV0QLLLUeVgD03dLuWX2wS~j-UpSQF3HASGqa3LSV15xlRWtzu09EjWRa~fND1kv9nqO92DWgKf1IA5ZFw7pgGLX-zQBfqaf2AXeTjaaPWWEdTPGOLElJ55Y6vjguqjPgNLXixLtpEuS~qWW-gmfFJknImBAi651nHCBi2GWqbEnmWgc9baa3q-Kk1q5ebx-odqVEaDUgCQGWpKWa0qE~l5OpZ3Z4oJNZ6thCBr8qeGbF9ujpVM~xdMGbFz6jh7KCjjBNElXdbL-bYJov7AwA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4">
-    </img>
-  </div>
-    <Text fontWeight="bold" variant="headingSm">Validate your product and the market</Text>
-<Text>URL</Text>
-<Text>www.atlrux.com</Text>
-<div className="lastcardbutton">
-    <Button>
-        Select
-    </Button>
-<Text>View</Text>
-</div>
-</Card>
-<Card>
-  <div className="cardimageholder">
-  <img className="cardimage" src="https://s3-alpha-sig.figma.com/img/9824/f33c/76647abb61891fe13da188ea01dbbb9d?Expires=1697414400&Signature=qjApYRx4npnAzwStxN4gThkhyqCjiaUQ00fNZ2FpGORRBbkxuqGcZoaRPRlNC2RVoeV0QLLLUeVgD03dLuWX2wS~j-UpSQF3HASGqa3LSV15xlRWtzu09EjWRa~fND1kv9nqO92DWgKf1IA5ZFw7pgGLX-zQBfqaf2AXeTjaaPWWEdTPGOLElJ55Y6vjguqjPgNLXixLtpEuS~qWW-gmfFJknImBAi651nHCBi2GWqbEnmWgc9baa3q-Kk1q5ebx-odqVEaDUgCQGWpKWa0qE~l5OpZ3Z4oJNZ6thCBr8qeGbF9ujpVM~xdMGbFz6jh7KCjjBNElXdbL-bYJov7AwA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4">
-    </img>
-  </div>
-    <Text fontWeight="bold" variant="headingSm">Validate your product and the market</Text>
-<Text>URL</Text>
-<Text>www.atlrux.com</Text>
-<div className="lastcardbutton">
-    <Button>
-        Select
-    </Button>
-<Text>View</Text>
-</div>
-</Card>
-<Card>
-  <div className="cardimageholder">
-  <img className="cardimage" src="https://s3-alpha-sig.figma.com/img/9824/f33c/76647abb61891fe13da188ea01dbbb9d?Expires=1697414400&Signature=qjApYRx4npnAzwStxN4gThkhyqCjiaUQ00fNZ2FpGORRBbkxuqGcZoaRPRlNC2RVoeV0QLLLUeVgD03dLuWX2wS~j-UpSQF3HASGqa3LSV15xlRWtzu09EjWRa~fND1kv9nqO92DWgKf1IA5ZFw7pgGLX-zQBfqaf2AXeTjaaPWWEdTPGOLElJ55Y6vjguqjPgNLXixLtpEuS~qWW-gmfFJknImBAi651nHCBi2GWqbEnmWgc9baa3q-Kk1q5ebx-odqVEaDUgCQGWpKWa0qE~l5OpZ3Z4oJNZ6thCBr8qeGbF9ujpVM~xdMGbFz6jh7KCjjBNElXdbL-bYJov7AwA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4">
-    </img>
-  </div>
-    <Text fontWeight="bold" variant="headingSm">Validate your product and the market</Text>
-<Text>URL</Text>
-<Text>www.atlrux.com</Text>
-<div className="lastcardbutton">
-    <Button>
-        Select
-    </Button>
-<Text>View</Text>
-</div>
-</Card>
-<Card>
-  <div className="cardimageholder">
-  <img className="cardimage" src="https://s3-alpha-sig.figma.com/img/9824/f33c/76647abb61891fe13da188ea01dbbb9d?Expires=1697414400&Signature=qjApYRx4npnAzwStxN4gThkhyqCjiaUQ00fNZ2FpGORRBbkxuqGcZoaRPRlNC2RVoeV0QLLLUeVgD03dLuWX2wS~j-UpSQF3HASGqa3LSV15xlRWtzu09EjWRa~fND1kv9nqO92DWgKf1IA5ZFw7pgGLX-zQBfqaf2AXeTjaaPWWEdTPGOLElJ55Y6vjguqjPgNLXixLtpEuS~qWW-gmfFJknImBAi651nHCBi2GWqbEnmWgc9baa3q-Kk1q5ebx-odqVEaDUgCQGWpKWa0qE~l5OpZ3Z4oJNZ6thCBr8qeGbF9ujpVM~xdMGbFz6jh7KCjjBNElXdbL-bYJov7AwA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4">
-    </img>
-  </div>
-    <Text fontWeight="bold" variant="headingSm">Validate your product and the market</Text>
-<Text>URL</Text>
-<Text>www.atlrux.com</Text>
-<div className="lastcardbutton">
-    <Button>
-        Select
-    </Button>
-<Text>View</Text>
-</div>
-</Card>
-<Card>
-  <div className="cardimageholder">
-  <img className="cardimage" src="https://s3-alpha-sig.figma.com/img/9824/f33c/76647abb61891fe13da188ea01dbbb9d?Expires=1697414400&Signature=qjApYRx4npnAzwStxN4gThkhyqCjiaUQ00fNZ2FpGORRBbkxuqGcZoaRPRlNC2RVoeV0QLLLUeVgD03dLuWX2wS~j-UpSQF3HASGqa3LSV15xlRWtzu09EjWRa~fND1kv9nqO92DWgKf1IA5ZFw7pgGLX-zQBfqaf2AXeTjaaPWWEdTPGOLElJ55Y6vjguqjPgNLXixLtpEuS~qWW-gmfFJknImBAi651nHCBi2GWqbEnmWgc9baa3q-Kk1q5ebx-odqVEaDUgCQGWpKWa0qE~l5OpZ3Z4oJNZ6thCBr8qeGbF9ujpVM~xdMGbFz6jh7KCjjBNElXdbL-bYJov7AwA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4">
-    </img>
-  </div>
-    <Text fontWeight="bold" variant="headingSm">Validate your product and the market</Text>
-<Text>URL</Text>
-<Text>www.atlrux.com</Text>
-<div className="lastcardbutton">
-    <Button>
-        Select
-    </Button>
-<Text>View</Text>
-</div>
-</Card>
-<Card>
-  <div className="cardimageholder">
-  <img className="cardimage" src="https://s3-alpha-sig.figma.com/img/9824/f33c/76647abb61891fe13da188ea01dbbb9d?Expires=1697414400&Signature=qjApYRx4npnAzwStxN4gThkhyqCjiaUQ00fNZ2FpGORRBbkxuqGcZoaRPRlNC2RVoeV0QLLLUeVgD03dLuWX2wS~j-UpSQF3HASGqa3LSV15xlRWtzu09EjWRa~fND1kv9nqO92DWgKf1IA5ZFw7pgGLX-zQBfqaf2AXeTjaaPWWEdTPGOLElJ55Y6vjguqjPgNLXixLtpEuS~qWW-gmfFJknImBAi651nHCBi2GWqbEnmWgc9baa3q-Kk1q5ebx-odqVEaDUgCQGWpKWa0qE~l5OpZ3Z4oJNZ6thCBr8qeGbF9ujpVM~xdMGbFz6jh7KCjjBNElXdbL-bYJov7AwA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4">
-    </img>
-  </div>
-    <Text fontWeight="bold" variant="headingSm">Validate your product and the market</Text>
-<Text>URL</Text>
-<Text>www.atlrux.com</Text>
-<div className="lastcardbutton">
-    <Button>
-        Select
-    </Button>
-<Text>View</Text>
-</div>
-</Card>
-<Card>
-  <div className="cardimageholder">
-  <img className="cardimage" src="https://s3-alpha-sig.figma.com/img/9824/f33c/76647abb61891fe13da188ea01dbbb9d?Expires=1697414400&Signature=qjApYRx4npnAzwStxN4gThkhyqCjiaUQ00fNZ2FpGORRBbkxuqGcZoaRPRlNC2RVoeV0QLLLUeVgD03dLuWX2wS~j-UpSQF3HASGqa3LSV15xlRWtzu09EjWRa~fND1kv9nqO92DWgKf1IA5ZFw7pgGLX-zQBfqaf2AXeTjaaPWWEdTPGOLElJ55Y6vjguqjPgNLXixLtpEuS~qWW-gmfFJknImBAi651nHCBi2GWqbEnmWgc9baa3q-Kk1q5ebx-odqVEaDUgCQGWpKWa0qE~l5OpZ3Z4oJNZ6thCBr8qeGbF9ujpVM~xdMGbFz6jh7KCjjBNElXdbL-bYJov7AwA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4">
-    </img>
-  </div>
-    <Text fontWeight="bold" variant="headingSm">Validate your product and the market</Text>
-<Text>URL</Text>
-<Text>www.atlrux.com</Text>
-<div className="lastcardbutton">
-    <Button>
-        Select
-    </Button>
-<Text>View</Text>
-</div>
-</Card>
-<Card>
-  <div className="cardimageholder">
-  <img className="cardimage" src="https://s3-alpha-sig.figma.com/img/9824/f33c/76647abb61891fe13da188ea01dbbb9d?Expires=1697414400&Signature=qjApYRx4npnAzwStxN4gThkhyqCjiaUQ00fNZ2FpGORRBbkxuqGcZoaRPRlNC2RVoeV0QLLLUeVgD03dLuWX2wS~j-UpSQF3HASGqa3LSV15xlRWtzu09EjWRa~fND1kv9nqO92DWgKf1IA5ZFw7pgGLX-zQBfqaf2AXeTjaaPWWEdTPGOLElJ55Y6vjguqjPgNLXixLtpEuS~qWW-gmfFJknImBAi651nHCBi2GWqbEnmWgc9baa3q-Kk1q5ebx-odqVEaDUgCQGWpKWa0qE~l5OpZ3Z4oJNZ6thCBr8qeGbF9ujpVM~xdMGbFz6jh7KCjjBNElXdbL-bYJov7AwA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4">
-    </img>
-  </div>
-    <Text fontWeight="bold" variant="headingSm">Validate your product and the market</Text>
-<Text>URL</Text>
-<Text>www.atlrux.com</Text>
-<div className="lastcardbutton">
-    <Button>
-        Select
-    </Button>
-<Text>View</Text>
-</div>
-</Card>
-<Card>
-  <div className="cardimageholder">
-  <img className="cardimage" src="https://s3-alpha-sig.figma.com/img/9824/f33c/76647abb61891fe13da188ea01dbbb9d?Expires=1697414400&Signature=qjApYRx4npnAzwStxN4gThkhyqCjiaUQ00fNZ2FpGORRBbkxuqGcZoaRPRlNC2RVoeV0QLLLUeVgD03dLuWX2wS~j-UpSQF3HASGqa3LSV15xlRWtzu09EjWRa~fND1kv9nqO92DWgKf1IA5ZFw7pgGLX-zQBfqaf2AXeTjaaPWWEdTPGOLElJ55Y6vjguqjPgNLXixLtpEuS~qWW-gmfFJknImBAi651nHCBi2GWqbEnmWgc9baa3q-Kk1q5ebx-odqVEaDUgCQGWpKWa0qE~l5OpZ3Z4oJNZ6thCBr8qeGbF9ujpVM~xdMGbFz6jh7KCjjBNElXdbL-bYJov7AwA__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4">
-    </img>
-  </div>
-    <Text fontWeight="bold" variant="headingSm">Validate your product and the market</Text>
-<Text>URL</Text>
-<Text>www.atlrux.com</Text>
-<div className="lastcardbutton">
-    <Button>
-        Select
-    </Button>
-<Text>View</Text>
-</div>
-</Card>
-</div>
-<div id="lastdiv">
-<div id="anotherdiv">
-<Pagination
-      hasPrevious
-      onPrevious={() => {
-        console.log('Previous');
-      }}
-      hasNext
-      onNext={() => {
-        console.log('Next');
-      }}
-    />
-    <Button primary>
-     Next
-    </Button>
-</div>
-</div>
-        </Page>
-    )
+export async function loader({ request }) {
+  const { session, admin } = await authenticate.admin(request);
+  const products = new Product(session.shop, admin.graphql);
+  const fetchproduct = await products.getProducts();
+  return json({
+    shopurl: session.shop,
+    products: fetchproduct.data.products.edges,
+  });
 }
-export default showproduct;
+export default function showproduct() {
+  const [checked, setChecked] = useState(false);
+
+  const handleChange = useCallback((newChecked) => setChecked(newChecked), []);
+  const { shopurl, products } = useLoaderData();
+
+  console.log("bull sheeeeeet");
+  console.log(products);
+  console.log("shop url is", shopurl);
+  return (
+    <Page>
+      <div id="firstcheckbox">
+        <Checkbox
+          label="Select All"
+          checked={checked}
+          onChange={handleChange}
+        />
+      </div>
+      <div id="grid">
+        {products.map((product, key) => (
+          <Card key={key}>
+            <div className="cardimageholder">
+              <img
+                className="cardimage"
+                src={product &&
+                      product.node &&
+                      product.node.images &&
+                      product.node.images.edges &&
+                      product.node.images.edges[0] &&
+                      product.node.images.edges[0].node.originalSrc ? product.node.images.edges[0].node.originalSrc : ""}
+                alt="Product Img"
+              ></img>
+            </div>
+            <Text fontWeight="bold" variant="headingSm">
+              {product.node.title}
+            </Text>
+            <Text>URL</Text>
+            <Link url={`https://${shopurl}/products/${product.node.handle}`}>Product Url</Link>
+            <div className="lastcardbutton">
+              <Button>Select</Button>
+              <Text>View</Text>
+            </div>
+          </Card>
+        ))}
+      </div>
+      <div id="lastdiv">
+        <div id="anotherdiv">
+          <Pagination
+            hasPrevious
+            onPrevious={() => {
+              console.log("Previous");
+            }}
+            hasNext
+            onNext={() => {
+              console.log("Next");
+            }}
+          />
+          <Button primary>Next</Button>
+        </div>
+      </div>
+    </Page>
+  );
+}

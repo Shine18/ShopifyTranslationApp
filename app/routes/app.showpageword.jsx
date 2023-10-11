@@ -10,7 +10,7 @@ const [secondclicked,setSecondClicked]=React.useState(false)
     const handleChange = useCallback((value) => {
         setSecondClicked(true)
         setSelected(value)}, []);
-  
+
 const [isClicked,setIsClicked]=React.useState(false)
 return(
     <Page>
@@ -47,7 +47,7 @@ Italian
     Next
 </Button>}
 </div>
-</Card> 
+</Card>
 
 {isClicked?<div id="secondcard">
 <Card>

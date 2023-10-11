@@ -18,7 +18,7 @@ import {
   LegacyStack,
 } from "@shopify/polaris";
 import styles from "~/styles/languageselection.css";
-import { useActionData, useSubmit } from "@remix-run/react";
+import { useActionData, useNavigate, useSubmit } from "@remix-run/react";
 import Shop from "~/models/Shop.server";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
@@ -49,13 +49,14 @@ export default function languageselection() {
   const [popoverActive, setPopoverActive] = useState(false);
   const [basePopoverActive, setBasePopoverActive] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState([]);
-
+  const navigate=useNavigate();
   const [checked, setChecked] = useState(false);
   const storedResult = actiondata?.storeLanguageResult;
 
   useEffect(() => {
     if (storedResult) {
-      console.log("this is the result baby", storedResult);
+
+      navigate('/app/showpageword');
     }
   }, [storedResult]);
 

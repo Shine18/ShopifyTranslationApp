@@ -199,7 +199,10 @@ export default function languageselection() {
                 </Text>
               </div>
               <div>
-                <Tag>{selected}</Tag>
+                {/* <Tag>{selected}</Tag> */}
+                <Tag>
+                  {options.find((option) => option.value === selected.toString())?.label}
+                </Tag>
               </div>
             </div>
           )}
@@ -229,7 +232,7 @@ export default function languageselection() {
                 <div style={{ marginTop: "2%" }}>
                   {selectedOptions.map((option, index) => (
                     <Tag key={index} onRemove={() => handleRemove(option)}>
-                      {option}
+                      {optionstwo.find((find) => find.value === option)?.label}
                     </Tag>
                   ))}
                 </div>

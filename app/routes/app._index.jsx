@@ -110,7 +110,10 @@ export default function Index() {
 
       navigate("/app/selectPlan");
     }
-  },[]);
+    else{
+      navigate("/app/languageselector");
+    }
+  },[currentPlan,navigate]);
   const productId = actionData?.product?.id.replace(
     "gid://shopify/Product/",
     ""

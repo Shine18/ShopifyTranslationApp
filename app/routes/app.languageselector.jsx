@@ -44,9 +44,10 @@ export async function action({ request }) {
 export default function languageselection() {
   const actiondata = useActionData();
   const submit = useSubmit();
-  const [selected, setSelected] = useState("Base language");
+  const [selected, setSelected] = useState([]);
   const [selectedtwo, setSelectedtwo] = useState("Target language");
   const [popoverActive, setPopoverActive] = useState(false);
+  const [basePopoverActive, setBasePopoverActive] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState([]);
 
   const [checked, setChecked] = useState(false);
@@ -56,13 +57,16 @@ export default function languageselection() {
     if (storedResult) {
       console.log("this is the result baby", storedResult);
     }
-  },[storedResult]);
+  }, [storedResult]);
 
   const togglePopoverActive = useCallback(
     () => setPopoverActive((popoverActive) => !popoverActive),
     []
   );
-
+  const toggleBasePopoverActive = useCallback(
+    () => setBasePopoverActive((basePopoverActive) => !basePopoverActive),
+    []
+  );
   const handleChange = useCallback(
     (selected) => setSelectedOptions(selected),
     []
@@ -71,6 +75,11 @@ export default function languageselection() {
   const activator = (
     <Button onClick={togglePopoverActive} disclosure>
       Target Language
+    </Button>
+  );
+  const baseActivator = (
+    <Button onClick={toggleBasePopoverActive} disclosure>
+      Base Language
     </Button>
   );
   const handleRemove = useCallback(
@@ -100,7 +109,6 @@ export default function languageselection() {
     []
   );
   const options = [
-    { label: "Base Language", value: "Base Language" },
     { label: "English (United States)", value: "en-us" },
     { label: "Russian", value: "ru" },
   ];
@@ -131,29 +139,47 @@ export default function languageselection() {
         <Card>
           <div id="selectiondivs">
             <LegacyStack spacing="4">
-            <Select
+              {/* <Select
               options={options}
               onChange={handleSelectChange}
               value={selected}
-            />
-            <VerticalStack>
-              <div>
-                <Popover
-                  active={popoverActive}
-                  activator={activator}
-                  onClose={togglePopoverActive}
-                  sectioned
-                >
-                  <ChoiceList
-                    allowMultiple
-                    title="Target Language"
-                    choices={optionstwo}
-                    selected={selectedOptions}
-                    onChange={handleChange}
-                  />
-                </Popover>
-              </div>
-            </VerticalStack>
+            /> */}
+              <VerticalStack>
+                <div>
+                  <Popover
+                    active={basePopoverActive}
+                    activator={baseActivator}
+                    onClose={toggleBasePopoverActive}
+                    sectioned
+                  >
+                    <ChoiceList
+                      allowMultiple={false}
+                      title="Base Language"
+                      choices={options}
+                      selected={selected}
+                      onChange={handleSelectChange}
+                    />
+                  </Popover>
+                </div>
+              </VerticalStack>
+              <VerticalStack>
+                <div>
+                  <Popover
+                    active={popoverActive}
+                    activator={activator}
+                    onClose={togglePopoverActive}
+                    sectioned
+                  >
+                    <ChoiceList
+                      allowMultiple
+                      title="Target Language"
+                      choices={optionstwo}
+                      selected={selectedOptions}
+                      onChange={handleChange}
+                    />
+                  </Popover>
+                </div>
+              </VerticalStack>
             </LegacyStack>
           </div>
 
@@ -173,11 +199,7 @@ export default function languageselection() {
                 </Text>
               </div>
               <div>
-                <Checkbox
-                  label={selected}
-                  checked={checked}
-                  onChange={handleChangethree}
-                />
+                <Tag>{selected}</Tag>
               </div>
             </div>
           )}

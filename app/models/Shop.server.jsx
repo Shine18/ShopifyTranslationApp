@@ -119,7 +119,7 @@ export default class Shop {
           id: this.shop.id
         },
         data:{
-          baseLanguageCode:base,
+          baseLanguageCode:base.toString(),
           TargetLanguagesCode:target.toString()
         }
       })

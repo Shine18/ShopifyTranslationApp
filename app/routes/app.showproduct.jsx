@@ -6,6 +6,8 @@ import {
   Page,
   Button,
   MediaCard,
+  TopBar,
+  Frame,
 } from "@shopify/polaris";
 import styles from "~/styles/showproduct.css";
 import { useState, useCallback, useEffect } from "react";
@@ -41,8 +43,20 @@ export default function showproduct() {
     const pros = selectedProducts;
     console.log("products are", pros);
   }, [selectedProducts]);
+  const userMenuMarkup = (
+    <div className="navLinks">
+        <Link to="/app/showpageword">Page</Link>
+        <Link to="/app/showproduct">Product</Link>
+        <Link to="/app/setting">Setting</Link>
+    </div>
+  );
+  const topBarMarkup = <TopBar searchField={userMenuMarkup} secondaryMenu={false}   />;
+
   return (
     <Page>
+      <div style={{height: '70px'}}>
+        <Frame topBar={topBarMarkup} />
+      </div>
       <div id="firstcheckbox">
         <Checkbox
           label="Select All"

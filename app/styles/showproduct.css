@@ -72,3 +72,20 @@
 .Polaris-LegacyCard{
   height:100%;
 }
+.Polaris-TopBar__Search{
+  align-items: center;
+    justify-content: start;
+    height: 100%;
+}
+.navLinks{
+  display: flex;
+  gap: 20px;
+}
+.navLinks a{
+  text-decoration: none;
+  color: #42474C;
+  font-weight: semi-bold;
+}
+.Polaris-TopBar__Container{
+  height:100%;
+}

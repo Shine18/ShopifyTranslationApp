@@ -5,14 +5,14 @@ import {
   Pagination,
   Page,
   Button,
-  Link
+  MediaCard,
 } from "@shopify/polaris";
 import styles from "~/styles/showproduct.css";
 import { useState, useCallback, useEffect } from "react";
 import Product from "~/models/Products.server";
 import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData, useNavigate } from "@remix-run/react";
 export const links = () => [{ rel: "stylesheet", href: styles }];
 export async function loader({ request }) {
   const { session, admin } = await authenticate.admin(request);
@@ -24,14 +24,23 @@ export async function loader({ request }) {
   });
 }
 export default function showproduct() {
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const [checked, setChecked] = useState(false);
-
   const handleChange = useCallback((newChecked) => setChecked(newChecked), []);
   const { shopurl, products } = useLoaderData();
-
-  console.log("bull sheeeeeet");
-  console.log(products);
-  console.log("shop url is", shopurl);
+  const navigateTo = function (url) {
+    open(url, "_blank");
+  };
+  const selectProduct = function (product) {
+    console.log("this is the selected product", product);
+    if (!selectedProducts.some((item) => item.node.id === product.node.id)) {
+      setSelectedProducts((prevProducts) => [...prevProducts, product]);
+    }
+  };
+  useEffect(() => {
+    const pros = selectedProducts;
+    console.log("products are", pros);
+  }, [selectedProducts]);
   return (
     <Page>
       <div id="firstcheckbox">
@@ -43,29 +52,45 @@ export default function showproduct() {
       </div>
       <div id="grid">
         {products.map((product, key) => (
-          <Card key={key}>
-            <div className="cardimageholder">
-              <img
-                className="cardimage"
-                src={product &&
-                      product.node &&
-                      product.node.images &&
-                      product.node.images.edges &&
-                      product.node.images.edges[0] &&
-                      product.node.images.edges[0].node.originalSrc ? product.node.images.edges[0].node.originalSrc : ""}
-                alt="Product Img"
-              ></img>
-            </div>
-            <Text fontWeight="bold" variant="headingSm">
-              {product.node.title}
-            </Text>
-            <Text>URL</Text>
-            <Link url={`https://${shopurl}/products/${product.node.handle}`}>Product Url</Link>
-            <div className="lastcardbutton">
-              <Button>Select</Button>
-              <Text>View</Text>
-            </div>
-          </Card>
+          <MediaCard
+            key={key}
+            portrait={true}
+            title={product.node.title}
+            secondaryAction={{
+              content: "View Product On Store",
+              onAction: () => {
+                navigateTo(
+                  `https://${shopurl}/products/${product.node.handle}`
+                );
+              },
+            }}
+            primaryAction={{
+              content: "Select",
+              onAction: () => {
+                selectProduct(product);
+              },
+            }}
+          >
+            <img
+              width="100%"
+              height="100%"
+              style={{
+                objectFit: "cover",
+                objectPosition: "center",
+              }}
+              src={
+                product &&
+                product.node &&
+                product.node.images &&
+                product.node.images.edges &&
+                product.node.images.edges[0] &&
+                product.node.images.edges[0].node.originalSrc
+                  ? product.node.images.edges[0].node.originalSrc
+                  : ""
+              }
+              alt="Product Img"
+            ></img>
+          </MediaCard>
         ))}
       </div>
       <div id="lastdiv">

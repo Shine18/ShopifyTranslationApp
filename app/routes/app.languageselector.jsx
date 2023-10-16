@@ -16,9 +16,13 @@ import {
   HorizontalStack,
   VerticalStack,
   LegacyStack,
+  Icon,
 } from "@shopify/polaris";
+import {
+  MobileBackArrowMajor
+} from '@shopify/polaris-icons';
 import styles from "~/styles/languageselection.css";
-import { useActionData, useNavigate, useSubmit } from "@remix-run/react";
+import { Link, useActionData, useNavigate, useSubmit } from "@remix-run/react";
 import Shop from "~/models/Shop.server";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
@@ -49,7 +53,7 @@ export default function languageselection() {
   const [popoverActive, setPopoverActive] = useState(false);
   const [basePopoverActive, setBasePopoverActive] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState([]);
-  const navigate=useNavigate();
+  const navigate = useNavigate();
   const [checked, setChecked] = useState(false);
   const storedResult = actiondata?.storeLanguageResult;
 
@@ -134,10 +138,23 @@ export default function languageselection() {
     );
   }, [selectedOptions, selected, submit]);
   return (
-    <Page>
+    <Page fullWidth>
+
       <ui-title-bar title="Dev Pages List" />
       <div id="cardwith2select">
         <Card>
+          <div style={{ height: '70px' }}>
+
+            <div className='header-section'>
+              <span className='back-arrow-container'>
+                <Link to="/">
+                  <Icon
+                    source={MobileBackArrowMajor}
+                    tone="base"
+                  /></Link></span>
+            </div>
+
+          </div>
           <div id="selectiondivs">
             <LegacyStack spacing="4">
               {/* <Select

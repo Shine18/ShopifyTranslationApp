@@ -8,13 +8,17 @@ import {
   MediaCard,
   TopBar,
   Frame,
+  Icon
 } from "@shopify/polaris";
+import {
+  MobileBackArrowMajor
+} from '@shopify/polaris-icons';
 import styles from "~/styles/showproduct.css";
 import { useState, useCallback, useEffect } from "react";
 import Product from "~/models/Products.server";
 import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
-import { Link, useLoaderData, useNavigate } from "@remix-run/react";
+import { Link, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 export const links = () => [{ rel: "stylesheet", href: styles }];
 export async function loader({ request }) {
   const { session, admin } = await authenticate.admin(request);
@@ -26,6 +30,7 @@ export async function loader({ request }) {
   });
 }
 export default function showproduct() {
+  const location = useLocation();
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [checked, setChecked] = useState(false);
   const handleChange = useCallback((newChecked) => setChecked(newChecked), []);
@@ -43,19 +48,32 @@ export default function showproduct() {
     const pros = selectedProducts;
     console.log("products are", pros);
   }, [selectedProducts]);
-  const userMenuMarkup = (
-    <div className="navLinks">
-        <Link to="/app/showpageword">Page</Link>
-        <Link to="/app/showproduct">Product</Link>
-        <Link to="/app/setting">Setting</Link>
-    </div>
-  );
-  const topBarMarkup = <TopBar searchField={userMenuMarkup} secondaryMenu={false}   />;
-
   return (
     <Page>
-      <div style={{height: '70px'}}>
-        <Frame topBar={topBarMarkup} />
+      <div style={{ height: '70px' }}>
+        <Card>
+          <div className='header-section'>
+            <span className='back-arrow-container'>
+              <Link to={location.state?.prevurl ? location.state.prevurl : ""}
+              ><Icon
+                  source={MobileBackArrowMajor}
+                  tone="base"
+                /></Link></span>
+            <div className="navLinks">
+              <Link to="/app/showpageword" state={{ prevurl: "/app/showproduct" }} style={{
+                borderBottom: location.pathname === '/app/showpageword' ? '2px solid #00805F' : 'none',
+              }} >Page</Link>
+              <Link to="/app/showproduct" state={{ prevurl: "/app/showproduct" }}
+                style={{
+                  borderBottom: location.pathname === '/app/showproduct' ? '2px solid #00805F' : 'none',
+                }}>Product</Link>
+              <Link to="/app/setting" state={{ prevurl: "/app/showproduct" }}
+                style={{
+                  borderBottom: location.pathname === '/app/setting' ? '2px solid #00805F' : 'none',
+                }}>Setting</Link>
+            </div>
+          </div>
+        </Card>
       </div>
       <div id="firstcheckbox">
         <Checkbox
@@ -94,11 +112,11 @@ export default function showproduct() {
               }}
               src={
                 product &&
-                product.node &&
-                product.node.images &&
-                product.node.images.edges &&
-                product.node.images.edges[0] &&
-                product.node.images.edges[0].node.originalSrc
+                  product.node &&
+                  product.node.images &&
+                  product.node.images.edges &&
+                  product.node.images.edges[0] &&
+                  product.node.images.edges[0].node.originalSrc
                   ? product.node.images.edges[0].node.originalSrc
                   : ""
               }

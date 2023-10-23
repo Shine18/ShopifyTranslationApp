@@ -54,7 +54,6 @@ const showpageword = () => {
   const handleSelectChange = (newSelected) => { console.log(newSelected) }
   useEffect(() => {
     const selectedpages = choiceSelected
-    console.log(selectedpages);
     selectedpages.map(value => {
       const pagefound = pages.pages.find(val => val.id === value.id)
       console.log("Found the Page", pagefound)

@@ -62,7 +62,6 @@ export default function languageselection() {
   const navigate = useNavigate();
   const [checked, setChecked] = useState(false);
   const storedResult = actiondata?.storeLanguageResult;
-  console.log("Languages are", fetchedlanguages.TargetLanguagesCode.split(','))
   useEffect(() => {
     if (fetchedlanguages)
       setSelectedOptions(fetchedlanguages.TargetLanguagesCode.split(','))
@@ -137,9 +136,6 @@ export default function languageselection() {
   ];
 
   const storeLanguages = useCallback(() => {
-    console.log("clicked");
-    console.log(selectedOptions);
-    console.log("selected", selected);
     const baselanguage = selected;
     const targetlanguages = selectedOptions;
     submit(

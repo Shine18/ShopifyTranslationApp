@@ -1,5 +1,5 @@
 .Polaris-HorizontalStack{
-   
+
     gap:1rem;
 }
 .Polaris-Text--headingMd{
@@ -16,10 +16,10 @@
    display: flex;
    flex-direction: column;
    gap:0.5rem;
- 
+
    align-items: flex-end;
     width:100%;
-   
+
 }
 #secondcard{
     margin-top: 3rem;
@@ -37,4 +37,27 @@ span{
 }
 #secondcardbutton .Polaris-Button--primary{
     width:6rem;
+}
+.Polaris-TopBar__Search{
+  align-items: center;
+    justify-content: start;
+    height: 100%;
+}
+.navLinks{
+  display: flex;
+  gap: 20px;
+}
+.navLinks a{
+  text-decoration: none;
+  color: #42474C;
+  font-weight: semi-bold;
+}
+.header-section{
+  display:flex;
+  flex-direction: row;
+  gap: 40px;
+}
+.back-arrow-container{
+  border: solid 1px #CCCCCC;
+  border-radius: 4px;
 }

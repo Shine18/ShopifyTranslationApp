@@ -43,14 +43,15 @@ export default class Shop {
     const currentPlan = await this.getCurrentPlan()
     if (currentPlan?.id === 0) {
       billingStatus = { isPaid: true }
-    }else if(currentPlan==null){
+    } else if (currentPlan == null) {
 
-      billingStatus= {iseNewShop:true}
+      billingStatus = { isNewShop: true }
+
     }
-     else {
+    else {
       billingStatus = await checkBilling(this.shopUrl, this.graphql, currentPlan)
     }
-
+    console.log("billing shop",billingStatus);
     return {
       ...billingStatus
     }
@@ -110,5 +111,56 @@ export default class Shop {
     console.log("new shop created", createShop)
     return createShop;
 
+  }
+  async addLanguages(base, target) {
+    await this.getShop()
+    if (this.shop) {
+      const storeLanguage = await prisma.shop.update({
+        where: {
+          id: this.shop.id
+        },
+        data: {
+          baseLanguageCode: base.toString(),
+          TargetLanguagesCode: target.toString()
+        }
+      })
+      return storeLanguage
+    }
+  }
+  async checkLanguages() {
+    await this.getShop()
+    if (this.shop) {
+      const targelanguage = await prisma.shop.findUnique({
+        where: {
+          id: this.shop.id
+        },
+        select: {
+          TargetLanguagesCode: true
+        }
+      })
+      if (targelanguage?.TargetLanguagesCode) {
+        return true
+      }
+      else
+        return false
+    }
+  }
+  async fetchLanguages() {
+    await this.getShop()
+    if (this.shop) {
+      const fetchedlanguages = await prisma.shop.findUnique({
+        where: {
+          id: this.shop.id
+        },
+        select: {
+          TargetLanguagesCode: true
+        }
+      })
+      if (fetchedlanguages?.TargetLanguagesCode) {
+        return fetchedlanguages
+      }
+      else
+        return false
+    }
   }
 }

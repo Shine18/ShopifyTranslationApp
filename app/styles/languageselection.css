@@ -1,44 +1,61 @@
-.Polaris-Select__Input{
-
-width:7rem !important;
-
+.Polaris-Select__Input {
+  width: 7rem !important;
 }
-.Polaris-Checkbox__Backdrop:before{
-    background:#008060 !important; 
+.Polaris-Checkbox__Backdrop:before {
+  background: #008060 !important;
 }
-#selectiondivs{
-
-    display: flex;
-    flex-direction: row;
+#selectiondivs {
+  display: flex;
+  flex-direction: row;
 }
 
-.checkboxpopup{
-background-color: aqua;
-    width: 10rem !important;
-margin-top: -0.5rem !important;
-    z-index: 10 !important;
-    position: absolute;
+.checkboxpopup {
+  background-color: aqua;
+  width: 10rem !important;
+  margin-top: -0.5rem !important;
+  z-index: 10 !important;
+  position: absolute;
 }
-.selectdiv{
-    position: relative;
+.selectdiv {
+  position: relative;
 }
-.selectdiv select{
-    width: 10rem !important;
+.selectdiv select {
+  width: 10rem !important;
 }
-#nextbutton{
-   margin-top: 5%;
-    display: flex;
-    justify-content: flex-end;
+#nextbutton {
+  margin-top: 5%;
+  display: flex;
+  justify-content: flex-end;
 }
-#nextbutton .Polaris-Button{
-    background-color: #008060;
-color: white;
+#nextbutton .Polaris-Button {
+  background-color: #008060;
+  color: white;
 }
-.Polaris-Tag{
-    margin-left: 0.5%;
+.Polaris-Tag {
+  margin-left: 0.5%;
 }
-#cardwith2select .Polaris-Box{
-    -webkit-box-shadow: 0px 3px 20px 0px rgba(0,0,0,0.3);
-    -moz-box-shadow: 0px 3px 20px 0px rgba(0,0,0,0.3);
-    box-shadow: 0px 3px 20px 0px rgba(0,0,0,0.7);
+/* #cardwith2select .Polaris-Box {
+  -webkit-box-shadow: 0px 3px 20px 0px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0px 3px 20px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 3px 20px 0px rgba(0, 0, 0, 0.7);
+} */
+#LanguageCard{
+  margin-bottom: 30px;
+}
+#LanguageCard .Polaris-Box {
+  border-radius: 6px;
+  box-shadow: 0px 6px 20px 0px rgba(0, 0, 0, 0.1);
+}
+.header-section {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+}
+.back-arrow-container {
+  border: solid 1px #cccccc;
+  border-radius: 4px;
+  padding: 9px;
+}
+#selectiondivs .Polaris-Button{
+  border: none;
 }

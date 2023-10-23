@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Card,
   Text,
@@ -37,17 +37,32 @@ const showpageword = () => {
   const { pages } = useLoaderData();
   const [selected, setSelected] = useState([""]);
   const [secondclicked, setSecondClicked] = React.useState(false);
+  const [words, setWords] = useState(0)
   const handleChange = useCallback((value) => {
     setSecondClicked(true);
     setSelected(value);
   }, []);
-
+  console.log("pages are", pages)
   const [isClicked, setIsClicked] = React.useState(false);
   const [choiceSelected, setChoiceSelected] = useState([]);
-  const titles = ['/404', '/blogs', '/cart', ...pages.pages.map(page => '/' + page.title.toString().toLowerCase())];
-
+  const titles = [
+    { title: '/404', id: 1 },
+    { title: '/blogs', id: 2 },
+    { title: '/cart', id: 3 },
+    ...pages.pages.map(page => ({ title: '/' + page.title.toString().toLowerCase(), id: page.id }))
+  ];
   const handleSelectChange = (newSelected) => { console.log(newSelected) }
-
+  useEffect(() => {
+    const selectedpages = choiceSelected
+    console.log(selectedpages);
+    selectedpages.map(value => {
+      const pagefound = pages.pages.find(val => val.id === value.id)
+      console.log("Found the Page", pagefound)
+      if(pagefound){
+          console.log("found")
+      }
+    })
+  })
   return (
     <Page
       fullWidth>
@@ -83,16 +98,18 @@ const showpageword = () => {
         <Grid.Cell area="sidebar">
           <Card>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px;" }}>
-              {titles.map((title, index) => (
+              {titles.map((data, index) => (
                 <Checkbox
                   key={index}
-                  label={title}
-                  checked={choiceSelected.includes(title)}
+                  label={data.title}
+                  checked={choiceSelected.some(choice => choice.id === data.id)}
                   onChange={(newChecked) => {
                     if (newChecked) {
-                      setChoiceSelected((choiceSelected) => [...choiceSelected, title]);
+
+                      setChoiceSelected(prev => [...prev, data])
                     } else {
-                      setChoiceSelected((choiceSelected) => choiceSelected.filter((item) => item !== title));
+
+                      setChoiceSelected(prev => prev.filter(choice => choice.id !== data.id))
                     }
                   }}
                 />

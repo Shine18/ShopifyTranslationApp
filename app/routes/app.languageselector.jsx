@@ -17,20 +17,25 @@ import {
   VerticalStack,
   LegacyStack,
   Icon,
+  Link
 } from "@shopify/polaris";
 import {
   MobileBackArrowMajor
 } from '@shopify/polaris-icons';
 import styles from "~/styles/languageselection.css";
-import { Link, useActionData, useNavigate, useSubmit } from "@remix-run/react";
+import { useActionData, useLoaderData, useNavigate, useSubmit } from "@remix-run/react";
 import Shop from "~/models/Shop.server";
 
 export const links = () => [{ rel: "stylesheet", href: styles }];
 
 export const loader = async ({ request }) => {
-  const { session } = await authenticate.admin(request);
-
-  return json({ shop: session.shop.replace(".myshopify.com", "") });
+  const { session, admin } = await authenticate.admin(request);
+  const shopobj = new Shop(session.shop, admin.graphql);
+  const fetchedlanguages = await shopobj.fetchLanguages();
+  return json({
+    shop: session.shop.replace(".myshopify.com", ""),
+    fetchedlanguages: fetchedlanguages
+  });
 };
 export async function action({ request }) {
   const { session, admin } = await authenticate.admin(request);
@@ -47,6 +52,7 @@ export async function action({ request }) {
 
 export default function languageselection() {
   const actiondata = useActionData();
+  const { fetchedlanguages } = useLoaderData();
   const submit = useSubmit();
   const [selected, setSelected] = useState([]);
   const [selectedtwo, setSelectedtwo] = useState("Target language");
@@ -56,7 +62,11 @@ export default function languageselection() {
   const navigate = useNavigate();
   const [checked, setChecked] = useState(false);
   const storedResult = actiondata?.storeLanguageResult;
-
+  console.log("Languages are", fetchedlanguages.TargetLanguagesCode.split(','))
+  useEffect(() => {
+    if (fetchedlanguages)
+      setSelectedOptions(fetchedlanguages.TargetLanguagesCode.split(','))
+  }, [fetchedlanguages])
   useEffect(() => {
     if (storedResult) {
 
@@ -147,7 +157,7 @@ export default function languageselection() {
 
             <div className='header-section'>
               <span className='back-arrow-container'>
-                <Link to="/">
+                <Link url="/app">
                   <Icon
                     source={MobileBackArrowMajor}
                     tone="base"
@@ -155,52 +165,55 @@ export default function languageselection() {
             </div>
 
           </div>
-          <div id="selectiondivs">
-            <LegacyStack spacing="4">
-              {/* <Select
+          <div id="LanguageCard">
+            <Card>
+              <div id="selectiondivs">
+                <LegacyStack spacing="4">
+                  {/* <Select
               options={options}
               onChange={handleSelectChange}
               value={selected}
             /> */}
-              <VerticalStack>
-                <div>
-                  <Popover
-                    active={basePopoverActive}
-                    activator={baseActivator}
-                    onClose={toggleBasePopoverActive}
-                    sectioned
-                  >
-                    <ChoiceList
-                      allowMultiple={false}
-                      title="Base Language"
-                      choices={options}
-                      selected={selected}
-                      onChange={handleSelectChange}
-                    />
-                  </Popover>
-                </div>
-              </VerticalStack>
-              <VerticalStack>
-                <div>
-                  <Popover
-                    active={popoverActive}
-                    activator={activator}
-                    onClose={togglePopoverActive}
-                    sectioned
-                  >
-                    <ChoiceList
-                      allowMultiple
-                      title="Target Language"
-                      choices={optionstwo}
-                      selected={selectedOptions}
-                      onChange={handleChange}
-                    />
-                  </Popover>
-                </div>
-              </VerticalStack>
-            </LegacyStack>
+                  <VerticalStack>
+                    <div>
+                      <Popover
+                        active={basePopoverActive}
+                        activator={baseActivator}
+                        onClose={toggleBasePopoverActive}
+                        sectioned
+                      >
+                        <ChoiceList
+                          allowMultiple={false}
+                          title="Base Language"
+                          choices={options}
+                          selected={selected}
+                          onChange={handleSelectChange}
+                        />
+                      </Popover>
+                    </div>
+                  </VerticalStack>
+                  <VerticalStack>
+                    <div>
+                      <Popover
+                        active={popoverActive}
+                        activator={activator}
+                        onClose={togglePopoverActive}
+                        sectioned
+                      >
+                        <ChoiceList
+                          allowMultiple
+                          title="Target Language"
+                          choices={optionstwo}
+                          selected={selectedOptions}
+                          onChange={handleChange}
+                        />
+                      </Popover>
+                    </div>
+                  </VerticalStack>
+                </LegacyStack>
+              </div>
+            </Card>
           </div>
-
           {selected !== "Base language" && (
             <div>
               <div>
@@ -218,9 +231,11 @@ export default function languageselection() {
               </div>
               <div>
                 {/* <Tag>{selected}</Tag> */}
-                <Tag>
-                  {options.find((option) => option.value === selected.toString())?.label}
-                </Tag>
+                {selected.length > 0 && (
+                  <Tag>
+                    {options.find((option) => option.value === selected.toString())?.label}
+                  </Tag>
+                )}
               </div>
             </div>
           )}
@@ -255,7 +270,7 @@ export default function languageselection() {
                   ))}
                 </div>
 
-                {selectedOptions.length > 0 && (
+                {selectedOptions.length > 0 && selected.length > 0 && (
                   <div id="nextbutton">
                     <Button onClick={storeLanguages}>Next</Button>
                   </div>
@@ -265,6 +280,6 @@ export default function languageselection() {
           </div>
         </Card>
       </div>
-    </Page>
+    </Page >
   );
 }

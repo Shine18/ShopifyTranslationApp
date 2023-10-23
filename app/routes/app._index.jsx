@@ -97,23 +97,16 @@ export async function action({ request }) {
 export default function Index() {
   const navigate = useNavigate();
 
-  const { shop, currentPlan } = useLoaderData();
+  const { shop, currentPlan,checkLanguage } = useLoaderData();
   const actionData = useActionData();
   const submit = useSubmit();
 
   console.log(actionData);
   console.log("current plan is ", currentPlan);
+  console.log("what is language now",checkLanguage)
   const isLoading = false;
   // ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
-  useEffect(() => {
-    if (!currentPlan) {
 
-      navigate("/app/selectPlan");
-    }
-    else{
-      navigate("/app/languageselector");
-    }
-  },[currentPlan,navigate]);
   const productId = actionData?.product?.id.replace(
     "gid://shopify/Product/",
     ""

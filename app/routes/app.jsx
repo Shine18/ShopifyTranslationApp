@@ -1,6 +1,6 @@
 import { json, redirect } from "@remix-run/node";
 
-import { Link, Outlet, useLoaderData, useRouteError,useNavigate } from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useRouteError, useNavigate } from "@remix-run/react";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css";
 import { boundary } from "@shopify/shopify-app-remix/server";
 import { AppProvider } from "@shopify/shopify-app-remix/react";
@@ -15,28 +15,37 @@ export async function loader({ request }) {
 
   const shopModel = new Shop(session.shop, admin.graphql);
   const { isPaid, confirmationUrl, isNewShop } = await shopModel.setupShop();
+  const checkLanguage = await shopModel.checkLanguages();
+  console.log("checking languages", checkLanguage);
 
   return json({
     apiKey: process.env.SHOPIFY_API_KEY,
     isPaid,
     confirmationUrl,
     isNewShop,
+    checkLanguage
   });
 }
 
 export default function App() {
-  const navigate=useNavigate();
-  const { apiKey, isPaid, confirmationUrl, isNewShop } = useLoaderData();
-
+  const navigate = useNavigate();
+  const { apiKey, isPaid, confirmationUrl, isNewShop, checkLanguage } = useLoaderData();
+  console.log("new shop", isNewShop)
+  useEffect(() => {
     if (isNewShop) {
-      console.log("new shop",isNewShop)
-      navigate("/selectPlan");
+
+      navigate("/app/selectPlan");
     }
 
+  }, [isNewShop])
   useEffect(() => {
     if (!isPaid && confirmationUrl) {
       open(confirmationUrl, "_top");
     }
+    else if (isPaid && checkLanguage == false) {
+      navigate("/app/languageselector");
+    }
+
   }, [isPaid, confirmationUrl]);
 
   return (

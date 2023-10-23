@@ -24,25 +24,42 @@ import { useState, useCallback } from "react";
 import { authenticate } from "~/shopify.server";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData, useLocation } from "@remix-run/react";
+import { stripHtml } from "string-strip-html";
+import wordsCount from 'words-count';
+import Shop from '~/models/Shop.server';
 export const links = () => [{ rel: "stylesheet", href: styles }];
 
 export async function loader({ request }) {
   const { session, admin } = await authenticate.admin(request);
   const response = await admin.rest.get({ path: "/pages.json" });
+  const shopobj = new Shop(session.shop, admin.graphql);
+  const fetchedlanguages = await shopobj.fetchLanguages();
   const pages = await response.json();
-  return json({ pages });
+  return json({ pages, fetchedlanguages });
 }
 const showpageword = () => {
   const location = useLocation();
-  const { pages } = useLoaderData();
+  const { pages, fetchedlanguages } = useLoaderData();
   const [selected, setSelected] = useState([""]);
   const [secondclicked, setSecondClicked] = React.useState(false);
+  const [selectedLanguages, setselectedLanguages] = useState([])
   const [words, setWords] = useState(0)
   const handleChange = useCallback((value) => {
     setSecondClicked(true);
     setSelected(value);
   }, []);
+  const optionstwo = [
+    { label: "English (United States)", value: "en-us" },
+    { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
+    { label: "Russian", value: "ru" },
+    { label: "Chinese (Taiwan)", value: "zh-tw" },
+    { label: "French (Standard)", value: "fr" },
+  ];
   console.log("pages are", pages)
+  useEffect(() => {
+    if (fetchedlanguages)
+      setselectedLanguages(fetchedlanguages.TargetLanguagesCode.split(','))
+  }, [fetchedlanguages])
   const [isClicked, setIsClicked] = React.useState(false);
   const [choiceSelected, setChoiceSelected] = useState([]);
   const titles = [
@@ -53,15 +70,27 @@ const showpageword = () => {
   ];
   const handleSelectChange = (newSelected) => { console.log(newSelected) }
   useEffect(() => {
-    const selectedpages = choiceSelected
-    selectedpages.map(value => {
-      const pagefound = pages.pages.find(val => val.id === value.id)
-      console.log("Found the Page", pagefound)
-      if(pagefound){
-          console.log("found")
+    let totalWords = 0;
+    choiceSelected.map((value) => {
+      const pageFound = pages.pages.find((val) => val.id === value.id);
+      if (pageFound) {
+        const strippedHtml = stripHtml(pageFound.body_html).result;
+        totalWords += wordsCount(strippedHtml);
       }
-    })
-  })
+    });
+    setWords(totalWords);
+  }, [choiceSelected]);
+
+  const handleCheckboxChange = (newChecked, data) => {
+    if (newChecked) {
+      setChoiceSelected((prev) => [...prev, data]);
+    } else {
+      const pageFound = pages.pages.find((val) => val.id === data.id);
+      const strippedHtml = stripHtml(pageFound.body_html).result;
+      setWords((prev) => prev - wordsCount(strippedHtml));
+      setChoiceSelected((prev) => prev.filter((choice) => choice.id !== data.id));
+    }
+  };
   return (
     <Page
       fullWidth>
@@ -103,13 +132,7 @@ const showpageword = () => {
                   label={data.title}
                   checked={choiceSelected.some(choice => choice.id === data.id)}
                   onChange={(newChecked) => {
-                    if (newChecked) {
-
-                      setChoiceSelected(prev => [...prev, data])
-                    } else {
-
-                      setChoiceSelected(prev => prev.filter(choice => choice.id !== data.id))
-                    }
+                    handleCheckboxChange(newChecked, data);
                   }}
                 />
               ))}
@@ -125,10 +148,20 @@ const showpageword = () => {
               Lorem ipsum dolor sit amet
             </Text>
             <HorizontalStack>
-              <Tag onRemove={() => { }}>Russia</Tag>
-              <Tag onRemove={() => { }}>Chinese</Tag>
-              <Tag onRemove={() => { }}>French</Tag>
-              <Tag onRemove={() => { }}>Italian</Tag>
+              {
+                selectedLanguages.map(lang => {
+                  const option = optionstwo.find(option => option.value === lang);
+                  return option ?
+                    <Tag
+                      onRemove={() => {
+                        const updatedLanguages = selectedLanguages.filter(selectedLang => selectedLang !== lang);
+                        setselectedLanguages(updatedLanguages);
+                      }}
+                    >
+                      {option.label}
+                    </Tag> : null;
+                })
+              }
             </HorizontalStack>
 
             <Text variant="headingMd" as="h1">
@@ -136,7 +169,7 @@ const showpageword = () => {
             </Text>
             <div id="totalbutton">
               <Text fontWeight="regular" variant="headingSm" as="p">
-                1200
+                {words}
               </Text>
               {isClicked ? (
                 ``
@@ -145,6 +178,7 @@ const showpageword = () => {
                   onClick={() => setIsClicked(true)}
                   textAlign="center"
                   primary="true"
+                  disabled={choiceSelected.length < 1}
                 >
                   Next
                 </Button>
@@ -156,17 +190,17 @@ const showpageword = () => {
             <div id="secondcard">
               <Card>
                 <ChoiceList
-                  title="Company name"
+                  title="Select Translator"
                   choices={[
                     {
-                      label: "Hidden",
-                      value: "hidden",
-                      helpText: "Company name will be hidden.",
+                      label: "Artificial Intelligence",
+                      value: "AI",
+                      helpText: " Lorem ipsum dolor sit amet",
                     },
                     {
-                      label: "Optional",
-                      value: "optional",
-                      helpText: "Company name will be optional.",
+                      label: "Human",
+                      value: "Human",
+                      helpText: " Lorem ipsum dolor sit amet",
                     },
                   ]}
                   selected={selected}

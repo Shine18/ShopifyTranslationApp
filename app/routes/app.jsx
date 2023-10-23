@@ -16,8 +16,6 @@ export async function loader({ request }) {
   const shopModel = new Shop(session.shop, admin.graphql);
   const { isPaid, confirmationUrl, isNewShop } = await shopModel.setupShop();
   const checkLanguage = await shopModel.checkLanguages();
-  console.log("checking languages", checkLanguage);
-
   return json({
     apiKey: process.env.SHOPIFY_API_KEY,
     isPaid,

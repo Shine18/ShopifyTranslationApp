@@ -25,3 +25,8 @@ text-align: center;
 .Polaris-DataTable__Cell--header,.Polaris-DataTable--cellTotalFooter:first-child{
     font-weight: bold !important;
 }
+
+
+.Polaris-Tag{
+background-color: #008060;
+}

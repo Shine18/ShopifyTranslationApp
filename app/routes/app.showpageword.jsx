@@ -91,6 +91,42 @@ const showpageword = () => {
       setChoiceSelected((prev) => prev.filter((choice) => choice.id !== data.id));
     }
   };
+  const translatePages = () => {
+    setIsClicked(true);
+    console.log("i am being clicked");
+
+    const selectedPages = choiceSelected;
+    const languages = selectedLanguages;
+
+    selectedPages.forEach((value) => {
+      const pageFound = pages.pages.find((val) => val.id === value.id);
+      if (pageFound) {
+        languages.forEach((language) => {
+          const params = {
+            q: pageFound.body_html,
+            target: language,
+            format: 'html'
+          };
+
+          fetch('https://translation.googleapis.com/language/translate/v2?key=AIzaSyDd4uM6XAcs0lF4PF_qKrK7MtS29qikbCI', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(params),
+          })
+            .then(response => response.json())
+            .then(data => {
+              console.log(data);
+
+            })
+            .catch((error) => {
+              console.error('Failed to translate:', error);
+            });
+        });
+      };
+    });
+  };
   return (
     <Page
       fullWidth>
@@ -209,7 +245,7 @@ const showpageword = () => {
                 {secondclicked ? (
                   <div id="secondcardbutton">
                     <Button
-                      onClick={() => setIsClicked(true)}
+                      onClick={translatePages}
                       textAlign="center"
                       primary="true"
                     >

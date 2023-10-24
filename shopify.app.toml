@@ -1,20 +1,27 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-name = "Translationtest"
-client_id = "beaf487c4502255b8f9821fc5a568f79"
-application_url = "https://translation-app-zeta.vercel.app"
+name = "translationappmf"
+client_id = "138e1cce5b96d7573dbf5afcb607f166"
+application_url = "https://identifies-image-replied-contains.trycloudflare.com"
 embedded = true
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-use_legacy_install_flow = true
-scopes="read_products,write_products,read_content, read_online_store_pages"
+scopes = "read_products,write_products,read_content,read_online_store_pages"
 
 [auth]
-redirect_urls = [ "https://translation-app-zeta.vercel.app/api/auth" ]
+redirect_urls = [
+  "https://identifies-image-replied-contains.trycloudflare.com/auth/callback",
+  "https://identifies-image-replied-contains.trycloudflare.com/auth/shopify/callback",
+  "https://identifies-image-replied-contains.trycloudflare.com/api/auth/callback"
+]
 
 [webhooks]
-api_version = "2023-10"
+api_version = "2023-07"
 
 [pos]
 embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "translationapp.myshopify.com"

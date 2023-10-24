@@ -1,6 +1,6 @@
 import React from 'react'
 import { DataTable,Card, Text,Checkbox, IndexTable, Page, Badge,Tag,HorizontalStack, VerticalStack,Button,ChoiceList } from "@shopify/polaris";
-import styles from '../styles/summary.css';
+import styles from '~/styles/summary.css';
 import {useState, useCallback} from 'react';
 export const links = () => [{ rel: "stylesheet", href: styles }];
 const summary=()=>{
@@ -32,13 +32,13 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit.
                   <div class="selectedcard">
                     <span>Russian</span>
                   </div>
-                  <div  class="selectedcard" style={{marginLeft:'1rem'}}>
+                  <div  class="selectedcard">
                     <span>Chinese</span>
                   </div>
-                  <div  class="selectedcard" style={{marginLeft:'1rem'}}>
+                  <div  class="selectedcard">
                     <span>French</span>
                   </div>
-                  <div  class="selectedcard" style={{marginLeft:'1rem'}}>
+                  <div  class="selectedcard">
                     <span>Italian</span>
                   </div>
               </HorizontalStack>

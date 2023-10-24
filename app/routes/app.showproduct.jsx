@@ -19,6 +19,7 @@ import Product from "~/models/Products.server";
 import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 import { Link, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
+import ShowPageword from '../component/Showpagewordcomponent'
 export const links = () => [{ rel: "stylesheet", href: styles }];
 export async function loader({ request }) {
   const { session, admin } = await authenticate.admin(request);
@@ -33,6 +34,7 @@ export default function showproduct() {
   const location = useLocation();
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [checked, setChecked] = useState(false);
+  const [nextclicked,setNextClicked]=useState(false);
   const handleChange = useCallback((newChecked) => setChecked(newChecked), []);
   const { shopurl, products } = useLoaderData();
   const navigateTo = function (url) {
@@ -50,7 +52,8 @@ export default function showproduct() {
   }, [selectedProducts]);
   return (
     <Page>
-      <div style={{ height: '70px' }}>
+  {nextclicked?<ShowPageword></ShowPageword>:<>
+  <div style={{ height: '70px' }}>
         <Card>
           <div className='header-section'>
             <span className='back-arrow-container'>
@@ -137,9 +140,10 @@ export default function showproduct() {
               console.log("Next");
             }}
           />
-          <Button primary>Next</Button>
+          <Button onClick={()=>setNextClicked(true)} primary>Next</Button>
         </div>
       </div>
+  </>}
     </Page>
   );
 }

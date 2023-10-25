@@ -20,7 +20,13 @@ import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 import { Link, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import ShowPageword from '../component/Showpagewordcomponent'
-export const links = () => [{ rel: "stylesheet", href: styles }];
+import componentstyles from "~/styles/summary.css";
+import pagewordcomponentstyles from "~/styles/showpageword.css";
+export const links = () => [
+  { rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: componentstyles },
+  { rel: "stylesheet", href: pagewordcomponentstyles }
+];
 export async function loader({ request }) {
   const { session, admin } = await authenticate.admin(request);
   const products = new Product(session.shop, admin.graphql);

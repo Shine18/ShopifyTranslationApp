@@ -19,6 +19,7 @@ import {
 import {
   MobileBackArrowMajor
 } from '@shopify/polaris-icons';
+import Humansummary from "~/component/Humansummary";
 import styles from "~/styles/showpageword.css";
 import { useState, useCallback } from "react";
 import { authenticate } from "~/shopify.server";
@@ -27,8 +28,11 @@ import { Link, useLoaderData, useLocation } from "@remix-run/react";
 import { stripHtml } from "string-strip-html";
 import wordsCount from 'words-count';
 import Shop from '~/models/Shop.server';
-export const links = () => [{ rel: "stylesheet", href: styles }];
-
+import componentstyles from "~/styles/summary.css";
+export const links = () => [
+  { rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: componentstyles }
+];
 export async function loader({ request }) {
   const { session, admin } = await authenticate.admin(request);
   const response = await admin.rest.get({ path: "/pages.json" });
@@ -43,6 +47,7 @@ const showpageword = () => {
   const [selected, setSelected] = useState([""]);
   const [secondclicked, setSecondClicked] = React.useState(false);
   const [selectedLanguages, setselectedLanguages] = useState([])
+  const [showSummary,setShowSummary]=useState(false);
   const [words, setWords] = useState(0)
   const handleChange = useCallback((value) => {
     setSecondClicked(true);
@@ -92,176 +97,146 @@ const showpageword = () => {
     }
   };
   const translatePages = () => {
-    setIsClicked(true);
+    setShowSummary(true);
     console.log("i am being clicked");
-
-    const selectedPages = choiceSelected;
-    const languages = selectedLanguages;
-
-    selectedPages.forEach((value) => {
-      const pageFound = pages.pages.find((val) => val.id === value.id);
-      if (pageFound) {
-        languages.forEach((language) => {
-          const params = {
-            q: pageFound.body_html,
-            target: language,
-            format: 'html'
-          };
-
-          fetch('https://translation.googleapis.com/language/translate/v2?key=AIzaSyDd4uM6XAcs0lF4PF_qKrK7MtS29qikbCI', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(params),
-          })
-            .then(response => response.json())
-            .then(data => {
-              console.log(data);
-
-            })
-            .catch((error) => {
-              console.error('Failed to translate:', error);
-            });
-        });
-      };
-    });
   };
   return (
     <Page
       fullWidth>
-      <div style={{ height: '70px' }}>
-        <Card>
-          <div className='header-section'>
-            <span className='back-arrow-container'>
-              <Link to={location.state?.prevurl ? location.state.prevurl : ""}>
-                <Icon
-                  source={MobileBackArrowMajor}
-                  tone="base"
-                /></Link></span>
-            <div className="navLinks">
-              <Link to="/app/showpageword" state={{ prevurl: "/app/showpageword" }} style={{
-                borderBottom: location.pathname === '/app/showpageword' ? '2px solid #00805F' : 'none',
-              }}>Page</Link>
-              <Link to="/app/showproduct" state={{ prevurl: "/app/showpageword" }}>Product</Link>
-              <Link to="/app/setting" state={{ prevurl: "/app/showpageword" }}>Setting</Link>
-            </div>
-          </div>
-        </Card>
-      </div>
-      <Grid columns={{ sm: 1, lg: 4 }}
-        areas={{
-          sm: [
-            'sidebar',
-            'maincontent',
-          ],
-          lg: [
-            'sidebar maincontent maincontent maincontent'
-          ],
-        }}>
-        <Grid.Cell area="sidebar">
+      {
+        showSummary ? <Humansummary totalwords={words} targetlanguages={selectedLanguages} /> : <> <div style={{ height: '70px' }}>
           <Card>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px;" }}>
-              {titles.map((data, index) => (
-                <Checkbox
-                  key={index}
-                  label={data.title}
-                  checked={choiceSelected.some(choice => choice.id === data.id)}
-                  onChange={(newChecked) => {
-                    handleCheckboxChange(newChecked, data);
-                  }}
-                />
-              ))}
+            <div className='header-section'>
+              <span className='back-arrow-container'>
+                <Link to={location.state?.prevurl ? location.state.prevurl : ""}>
+                  <Icon
+                    source={MobileBackArrowMajor}
+                    tone="base"
+                  /></Link></span>
+              <div className="navLinks">
+                <Link to="/app/showpageword" state={{ prevurl: "/app/showpageword" }} style={{
+                  borderBottom: location.pathname === '/app/showpageword' ? '2px solid #00805F' : 'none',
+                }}>Page</Link>
+                <Link to="/app/showproduct" state={{ prevurl: "/app/showpageword" }}>Product</Link>
+                <Link to="/app/setting" state={{ prevurl: "/app/showpageword" }}>Setting</Link>
+              </div>
             </div>
           </Card>
-        </Grid.Cell>
-        <Grid.Cell area='maincontent'>
-          <Card>
-            <Text variant="headingMd" as="h1">
-              Lorem ipsum dolor sit amet
-            </Text>
-            <Text fontWeight="regular" variant="headingSm" as="p">
-              Lorem ipsum dolor sit amet
-            </Text>
-            <HorizontalStack>
-              {
-                selectedLanguages.map(lang => {
-                  const option = optionstwo.find(option => option.value === lang);
-                  return option ?
-                    <Tag
-                      onRemove={() => {
-                        const updatedLanguages = selectedLanguages.filter(selectedLang => selectedLang !== lang);
-                        setselectedLanguages(updatedLanguages);
-                      }}
-                    >
-                      {option.label}
-                    </Tag> : null;
-                })
-              }
-            </HorizontalStack>
-
-            <Text variant="headingMd" as="h1">
-              Total words
-            </Text>
-            <div id="totalbutton">
-              <Text fontWeight="regular" variant="headingSm" as="p">
-                {words}
-              </Text>
-              {isClicked ? (
-                ``
-              ) : (
-                <Button
-                  onClick={() => setIsClicked(true)}
-                  textAlign="center"
-                  primary="true"
-                  disabled={choiceSelected.length < 1}
-                >
-                  Next
-                </Button>
-              )}
-            </div>
-          </Card>
-
-          {isClicked ? (
-            <div id="secondcard">
+        </div>
+          <Grid columns={{ sm: 1, lg: 4 }}
+            areas={{
+              sm: [
+                'sidebar',
+                'maincontent',
+              ],
+              lg: [
+                'sidebar maincontent maincontent maincontent'
+              ],
+            }}>
+            <Grid.Cell area="sidebar">
               <Card>
-                <ChoiceList
-                  title="Select Translator"
-                  choices={[
-                    {
-                      label: "Artificial Intelligence",
-                      value: "AI",
-                      helpText: " Lorem ipsum dolor sit amet",
-                    },
-                    {
-                      label: "Human",
-                      value: "Human",
-                      helpText: " Lorem ipsum dolor sit amet",
-                    },
-                  ]}
-                  selected={selected}
-                  onChange={handleChange}
-                />
-                {secondclicked ? (
-                  <div id="secondcardbutton">
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px;" }}>
+                  {titles.map((data, index) => (
+                    <Checkbox
+                      key={index}
+                      label={data.title}
+                      checked={choiceSelected.some(choice => choice.id === data.id)}
+                      onChange={(newChecked) => {
+                        handleCheckboxChange(newChecked, data);
+                      }}
+                    />
+                  ))}
+                </div>
+              </Card>
+            </Grid.Cell>
+            <Grid.Cell area='maincontent'>
+              <Card>
+                <Text variant="headingMd" as="h1">
+                  Lorem ipsum dolor sit amet
+                </Text>
+                <Text fontWeight="regular" variant="headingSm" as="p">
+                  Lorem ipsum dolor sit amet
+                </Text>
+                <HorizontalStack>
+                  {
+                    selectedLanguages.map(lang => {
+                      const option = optionstwo.find(option => option.value === lang);
+                      return option ?
+                        <Tag
+                          onRemove={() => {
+                            const updatedLanguages = selectedLanguages.filter(selectedLang => selectedLang !== lang);
+                            setselectedLanguages(updatedLanguages);
+                          }}
+                        >
+                          {option.label}
+                        </Tag> : null;
+                    })
+                  }
+                </HorizontalStack>
+
+                <Text variant="headingMd" as="h1">
+                  Total words
+                </Text>
+                <div id="totalbutton">
+                  <Text fontWeight="regular" variant="headingSm" as="p">
+                    {words}
+                  </Text>
+                  {isClicked ? (
+                    ``
+                  ) : (
                     <Button
-                      onClick={translatePages}
+                      onClick={() => setIsClicked(true)}
                       textAlign="center"
                       primary="true"
+                      disabled={choiceSelected.length < 1}
                     >
                       Next
                     </Button>
-                  </div>
-                ) : (
-                  ``
-                )}
+                  )}
+                </div>
               </Card>
-            </div>
-          ) : (
-            ""
-          )}
-        </Grid.Cell>
-      </Grid>
+
+              {isClicked ? (
+                <div id="secondcard">
+                  <Card>
+                    <ChoiceList
+                      title="Select Translator"
+                      choices={[
+                        {
+                          label: "Artificial Intelligence",
+                          value: "AI",
+                          helpText: " Lorem ipsum dolor sit amet",
+                        },
+                        {
+                          label: "Human",
+                          value: "Human",
+                          helpText: " Lorem ipsum dolor sit amet",
+                        },
+                      ]}
+                      selected={selected}
+                      onChange={handleChange}
+                    />
+                    {secondclicked ? (
+                      <div id="secondcardbutton">
+                        <Button
+                          onClick={translatePages}
+                          textAlign="center"
+                          primary="true"
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    ) : (
+                      ``
+                    )}
+                  </Card>
+                </div>
+              ) : (
+                ""
+              )}
+            </Grid.Cell>
+          </Grid></>
+      }
     </Page>
   );
 };

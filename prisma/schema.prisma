@@ -27,6 +27,7 @@ model Shop {
   plan                 Int?
   baseLanguageCode     String?
   TargetLanguagesCode  String?
+  wordsUsed            Int?   @default(0)
 }
 
 model Charge {

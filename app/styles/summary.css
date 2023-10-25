@@ -8,6 +8,7 @@
 .component-selectedcard .Polaris-Tag{
   color: white;
 }
+
 .Polaris-HorizontalStack {
   gap: 0.5rem;
 }
@@ -20,6 +21,7 @@
 }
 .component-pgwordtag .Polaris-Tag{
   color: white;
+  background: #008060;
 }
 .Polaris-Checkbox__Backdrop:before {
   background-color: #008060;

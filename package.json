@@ -34,7 +34,9 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-dropdown-select": "^4.10.0",
-    "react-select": "^5.7.4"
+    "react-select": "^5.7.4",
+    "string-strip-html": "^13.4.3",
+    "words-count": "^2.0.2"
   },
   "devDependencies": {
     "@remix-run/dev": "^1.19.1",

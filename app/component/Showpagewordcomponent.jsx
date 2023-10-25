@@ -24,25 +24,29 @@ import { useState, useCallback } from "react";
 import { authenticate } from "~/shopify.server";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData, useLocation } from "@remix-run/react";
-const showpageword = () => {
+const showpageword = ({ words, selectedLanguages, getShop, WordsCount }) => {
   const location = useLocation();
-
   const [selected, setSelected] = useState([""]);
   const [secondclicked, setSecondClicked] = React.useState(false);
   const handleChange = useCallback((value) => {
     setSecondClicked(true);
     setSelected(value);
   }, []);
-
+  console.log("my my words", words)
   const [isClicked, setIsClicked] = React.useState(false);
   const [lastclicked, setLastClicked] = React.useState(false)
   const [choiceSelected, setChoiceSelected] = useState([]);
-
   const handleSelectChange = (newSelected) => { console.log(newSelected) }
-
+  const optionstwo = [
+    { label: "English (United States)", value: "en-us" },
+    { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
+    { label: "Russian", value: "ru" },
+    { label: "Chinese (Taiwan)", value: "zh-tw" },
+    { label: "French (Standard)", value: "fr" },
+  ];
   return (
     <>
-      {lastclicked ? <Humansummary></Humansummary> : <>
+      {lastclicked ? <Humansummary totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} /> : <>
         <div style={{ height: '70px' }}>
 
         </div>
@@ -57,10 +61,15 @@ const showpageword = () => {
             </Text>
             <HorizontalStack>
               <div className="component-pgwordtag">
-                <Tag onRemove={() => { }}>Russia</Tag>
-                <Tag onRemove={() => { }}>Chinese</Tag>
-                <Tag onRemove={() => { }}>French</Tag>
-                <Tag onRemove={() => { }}>Italian</Tag>
+                {
+                  selectedLanguages.map(lang => {
+                    const option = optionstwo.find(option => option.value === lang);
+                    return option ?
+                      <Tag>
+                        {option.label}
+                      </Tag> : null;
+                  })
+                }
               </div>
             </HorizontalStack>
 
@@ -69,7 +78,7 @@ const showpageword = () => {
             </Text>
             <div id="totalbutton">
               <Text fontWeight="regular" variant="headingSm" as="p">
-                1200
+                {words}
               </Text>
               {isClicked ? (
                 ``
@@ -92,14 +101,14 @@ const showpageword = () => {
                   title="Company name"
                   choices={[
                     {
-                      label: "Hidden",
-                      value: "hidden",
-                      helpText: "Company name will be hidden.",
+                      label: "Artificial Intelligence",
+                      value: "AI",
+                      helpText: " Lorem ipsum dolor sit amet",
                     },
                     {
-                      label: "Optional",
-                      value: "optional",
-                      helpText: "Company name will be optional.",
+                      label: "Human",
+                      value: "Human",
+                      helpText: " Lorem ipsum dolor sit amet",
                     },
                   ]}
                   selected={selected}

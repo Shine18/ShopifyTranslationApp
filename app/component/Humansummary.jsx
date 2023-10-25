@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { DataTable, Card, Text, Checkbox, IndexTable, Page, Badge, Tag, HorizontalStack, VerticalStack, Button, ChoiceList } from "@shopify/polaris";
 import { useState, useCallback } from 'react';
-const summary = ({ totalwords, targetlanguages }) => {
+import { useActionData, useSubmit } from '@remix-run/react';
+const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount}) => {
+  const actiondata = useActionData();
+  const submit = useSubmit();
   const [checked, setChecked] = useState(false);
+  const storedWordsResult = actiondata?.storeUsedWords;
   const optionstwo = [
     { label: "English (United States)", value: "en-us" },
     { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
@@ -10,17 +14,22 @@ const summary = ({ totalwords, targetlanguages }) => {
     { label: "Chinese (Taiwan)", value: "zh-tw" },
     { label: "French (Standard)", value: "fr" },
   ];
+
+  const totalLanguages = targetlanguages.length;
+  const totalWordCount = totalLanguages * totalwords;
+  const remainingWords = WordsCount - totalWordCount;
   const rows = targetlanguages.map((data, index) => {
     const optionLabel = optionstwo.find(option => option.value === data)?.label || '';
-    return [optionLabel, totalwords, index === 0 ? 10000 : '', 400]
+    return [optionLabel, totalwords, index === 0 ? WordsCount : index === 1 ? totalWordCount : '', 400]
   });
   const handleChange = useCallback(
     (newChecked) => setChecked(newChecked),
     [],
   );
-  console.log("these are total words", totalwords)
-  const totalLanguages = targetlanguages.length;
-  const totalWordCount = totalLanguages * totalwords;
+  const addwords = useCallback(() => {
+    submit({ totalWords: totalWordCount },
+      { replace: true, method: "POST", encType: "application/json" })
+  }, [submit, totalWordCount])
   return (
     <Page>
       <Card>
@@ -65,7 +74,7 @@ const summary = ({ totalwords, targetlanguages }) => {
               'Cost',
             ]}
             rows={rows}
-            totals={['', totalWordCount, 8000, '$0']}
+            totals={['', totalWordCount, remainingWords, '$0']}
             showTotalsInFooter
           />
 
@@ -76,7 +85,7 @@ const summary = ({ totalwords, targetlanguages }) => {
             onChange={handleChange}
           />
           <div id="component-secondcardbutton">
-            <Button textAlign="center" primary="true">
+            <Button textAlign="center" primary="true" onClick={addwords}>
               Pay
             </Button>
           </div>

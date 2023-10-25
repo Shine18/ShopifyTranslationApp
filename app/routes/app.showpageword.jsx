@@ -24,7 +24,7 @@ import styles from "~/styles/showpageword.css";
 import { useState, useCallback } from "react";
 import { authenticate } from "~/shopify.server";
 import { json } from "@remix-run/node";
-import { Link, useLoaderData, useLocation } from "@remix-run/react";
+import { Link, useActionData, useLoaderData, useLocation } from "@remix-run/react";
 import { stripHtml } from "string-strip-html";
 import wordsCount from 'words-count';
 import Shop from '~/models/Shop.server';
@@ -39,20 +39,39 @@ export async function loader({ request }) {
   const shopobj = new Shop(session.shop, admin.graphql);
   const fetchedlanguages = await shopobj.fetchLanguages();
   const pages = await response.json();
-  return json({ pages, fetchedlanguages });
+  const getShop = await shopobj.getShop();
+  const WordsCount = await shopobj.getPlansWordCount();
+
+  return json({ pages, fetchedlanguages, getShop, WordsCount });
+}
+export async function action({ request }) {
+  const { session, admin } = await authenticate.admin(request);
+  const shop = new Shop(session.shop, admin.graphql);
+  const { totalWords } = await request.json();
+  const storeUsedWords = await shop.addWordsUsage(totalWords);
+  return json({
+    storeUsedWords,
+  });
 }
 const showpageword = () => {
   const location = useLocation();
-  const { pages, fetchedlanguages } = useLoaderData();
+  const { pages, fetchedlanguages, getShop, WordsCount } = useLoaderData();
+  const actiondata = useActionData();
+  const storedWordsResult = actiondata?.storeUsedWords;
   const [selected, setSelected] = useState([""]);
   const [secondclicked, setSecondClicked] = React.useState(false);
   const [selectedLanguages, setselectedLanguages] = useState([])
-  const [showSummary,setShowSummary]=useState(false);
+  const [showSummary, setShowSummary] = useState(false);
   const [words, setWords] = useState(0)
   const handleChange = useCallback((value) => {
     setSecondClicked(true);
     setSelected(value);
   }, []);
+  useEffect(() => {
+    setShowSummary(false);
+    setIsClicked(false);
+  }, [storedWordsResult]);
+
   const optionstwo = [
     { label: "English (United States)", value: "en-us" },
     { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
@@ -60,7 +79,6 @@ const showpageword = () => {
     { label: "Chinese (Taiwan)", value: "zh-tw" },
     { label: "French (Standard)", value: "fr" },
   ];
-  console.log("pages are", pages)
   useEffect(() => {
     if (fetchedlanguages)
       setselectedLanguages(fetchedlanguages.TargetLanguagesCode.split(','))
@@ -104,7 +122,7 @@ const showpageword = () => {
     <Page
       fullWidth>
       {
-        showSummary ? <Humansummary totalwords={words} targetlanguages={selectedLanguages} /> : <> <div style={{ height: '70px' }}>
+        showSummary ? <Humansummary totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} /> : <> <div style={{ height: '70px' }}>
           <Card>
             <div className='header-section'>
               <span className='back-arrow-container'>

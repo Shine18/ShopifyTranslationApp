@@ -23,8 +23,8 @@ import Humansummary from "~/component/Humansummary";
 import styles from "~/styles/showpageword.css";
 import { useState, useCallback } from "react";
 import { authenticate } from "~/shopify.server";
-import { json } from "@remix-run/node";
-import { Link, useActionData, useLoaderData, useLocation } from "@remix-run/react";
+import { json, redirect } from "@remix-run/node";
+import { Link, useActionData, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import { stripHtml } from "string-strip-html";
 import wordsCount from 'words-count';
 import Shop from '~/models/Shop.server';
@@ -63,6 +63,7 @@ export async function action({ request }) {
 }
 const showpageword = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { pages, fetchedlanguages, getShop, WordsCount, translatedPages } = useLoaderData();
   const actiondata = useActionData();
   const storedWordsResult = actiondata?.storeUsedWords;
@@ -135,11 +136,18 @@ const showpageword = () => {
     setShowSummary(true);
     console.log("i am being clicked");
   };
+  const initiateRedirect = (val) => {
+    if (val) {
+      console.log("brwaaaaaaaaa222222222222222")
+      setShowSummary(false);
+      setIsClicked(false);
+    }
+  }
   return (
     <Page
       fullWidth>
       {
-        showSummary ? <Humansummary totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} pages={selectedPages} /> : <> <div style={{ height: '70px' }}>
+        showSummary ? <Humansummary initiateRedirect={initiateRedirect} totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} pages={selectedPages} /> : <> <div style={{ height: '70px' }}>
           <Card>
             <div className='header-section'>
               <span className='back-arrow-container'>
@@ -272,7 +280,7 @@ const showpageword = () => {
             </Grid.Cell>
           </Grid></>
       }
-      {
+      {!showSummary ?
         translatedPages && translatedPages.length > 0 && (
           translatedPages.map(translatedPage => {
             const page = pages.pages.find(page => page.id.toString() === translatedPage.pageId.toString());
@@ -294,6 +302,7 @@ const showpageword = () => {
             }
           })
         )
+        : ""
       }
     </Page>
   );

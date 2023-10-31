@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { DataTable, Card, Text, Checkbox, IndexTable, Page, Badge, Tag, HorizontalStack, VerticalStack, Button, ChoiceList } from "@shopify/polaris";
 import { useState, useCallback } from 'react';
 import { useActionData, useSubmit } from '@remix-run/react';
-const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products = [], pages = [] }) => {
+const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products = [], pages = [], initiateRedirect }) => {
   const actiondata = useActionData();
   const submit = useSubmit();
   const [checked, setChecked] = useState(false);
@@ -72,6 +72,7 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
           console.error('Failed to translate:', error);
         });
     });
+    initiateRedirect(true)
   }
   useEffect(() => {
     const translatedpages=pagesTranslations;

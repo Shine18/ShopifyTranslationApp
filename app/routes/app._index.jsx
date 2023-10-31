@@ -1,327 +1,301 @@
-import { useEffect } from "react";
-import { json, redirect } from "@remix-run/node";
+import React, { useEffect } from 'react';
 import {
-  useActionData,
-  useLoaderData,
-  useLocation,
-  useNavigate,
-  useNavigation,
-  useSubmit,
-} from "@remix-run/react";
-import {
-  Page,
-  Layout,
-  Text,
-  VerticalStack,
   Card,
-  Button,
+  Text,
+  IndexTable,
+  Page,
+  Badge,
+  Tag,
   HorizontalStack,
-  Box,
-  Divider,
-  List,
-  Link,
+  VerticalStack,
+  Button,
+  ChoiceList,
+  Checkbox,
+  Frame,
+  TopBar,
+  Grid,
+  Icon
 } from "@shopify/polaris";
+import {
+  MobileBackArrowMajor
+} from '@shopify/polaris-icons';
+import Humansummary from "~/component/Humansummary";
+import styles from "~/styles/showpageword.css";
+import { useState, useCallback } from "react";
+import { authenticate } from "~/shopify.server";
+import { json } from "@remix-run/node";
+import { Link, useActionData, useLoaderData, useLocation } from "@remix-run/react";
+import { stripHtml } from "string-strip-html";
+import wordsCount from 'words-count';
+import Shop from '~/models/Shop.server';
+import componentstyles from "~/styles/summary.css";
+export const links = () => [
+  { rel: "stylesheet", href: styles },
+  { rel: "stylesheet", href: componentstyles }
+];
+export async function loader({ request }) {
+  const { session, admin } = await authenticate.admin(request);
+  const response = await admin.rest.get({ path: "/pages.json" });
+  const shopobj = new Shop(session.shop, admin.graphql);
+  const fetchedlanguages = await shopobj.fetchLanguages();
+  const translatedPages = await shopobj.getTranslatedPages();
+  const pages = await response.json();
+  const getShop = await shopobj.getShop();
+  const WordsCount = await shopobj.getPlansWordCount();
 
-import { authenticate } from "../shopify.server";
-import { testBillingMutation } from "~/models/Billing.server";
-import Shop from "~/models/Shop.server";
-
-export const loader = async ({ request }) => {
-  const { session } = await authenticate.admin(request);
-  const shopobj = new Shop();
-  const plancheck = await shopobj.getCurrentPlan();
-
-  return json({
-    shop: session.shop.replace(".myshopify.com", ""),
-    currentPlan: plancheck,
-  });
-};
-
-export async function action({ request }) {
-  const { admin, session } = await authenticate.admin(request);
-
-  const { action } = await request.json();
-
-  // console.log(body)
-  if (action == "generate") {
-    const color = ["Red", "Orange", "Yellow", "Green"][
-      Math.floor(Math.random() * 4)
-    ];
-    const response = await admin.graphql(
-      `#graphql
-        mutation populateProduct($input: ProductInput!) {
-          productCreate(input: $input) {
-            product {
-              id
-              title
-              handle
-              status
-              variants(first: 10) {
-                edges {
-                  node {
-                    id
-                    price
-                    barcode
-                    createdAt
-                  }
-                }
-              }
-            }
-          }
-        }`,
-      {
-        variables: {
-          input: {
-            title: `${color} Snowboard`,
-            variants: [{ price: Math.random() * 100 }],
-          },
-        },
-      }
-    );
-
-    const responseJson = await response.json();
-
-    return json({
-      product: responseJson.data.productCreate.product,
-    });
-  } else if (action == "testBilling") {
-    const billing = await testBillingMutation(session.shop, admin.graphql);
-    if (billing?.chargeURL) {
-      return json({
-        chargeUrl: billing.chargeURL,
-      });
-    }
-  }
+  return json({ pages, fetchedlanguages, getShop, WordsCount, translatedPages });
 }
-
-export default function Index() {
-  const navigate = useNavigate();
-
-  const { shop, currentPlan,checkLanguage } = useLoaderData();
-  const actionData = useActionData();
-  const submit = useSubmit();
-
-  console.log(actionData);
-  console.log("current plan is ", currentPlan);
-  console.log("what is language now",checkLanguage)
-  const isLoading = false;
-  // ["loading", "submitting"].includes(nav.state) && nav.formMethod === "POST";
-
-  const productId = actionData?.product?.id.replace(
-    "gid://shopify/Product/",
-    ""
-  );
-
-  const billingUrl = actionData?.chargeUrl;
+export async function action({ request }) {
+  const { session, admin } = await authenticate.admin(request);
+  const shop = new Shop(session.shop, admin.graphql);
+  const { totalWords, translatedpages, action } = await request.json();
+  let storeUsedWords;
+  let translatedresponse;
+  if (action === "TotalWordsCount") {
+    storeUsedWords = await shop.addWordsUsage(totalWords);
+  }
+  if (action === "saveTranslation") {
+    translatedresponse = shop.saveTranslations(translatedpages);
+  }
+  return json({
+    storeUsedWords,
+  });
+}
+const showpageword = () => {
+  const location = useLocation();
+  const { pages, fetchedlanguages, getShop, WordsCount, translatedPages } = useLoaderData();
+  const actiondata = useActionData();
+  const storedWordsResult = actiondata?.storeUsedWords;
+  const [selected, setSelected] = useState([""]);
+  const [selectedPages, setSelectedPages] = useState([]);
+  const [secondclicked, setSecondClicked] = React.useState(false);
+  const [selectedLanguages, setselectedLanguages] = useState([])
+  const [showSummary, setShowSummary] = useState(false);
+  const [words, setWords] = useState(0)
+  const handleChange = useCallback((value) => {
+    setSecondClicked(true);
+    setSelected(value);
+  }, []);
   useEffect(() => {
-    if (productId) {
-      shopify.toast.show("Product created");
-    }
-  }, [productId]);
-
+    setShowSummary(false);
+    setIsClicked(false);
+  }, [storedWordsResult]);
   useEffect(() => {
-    if (billingUrl) {
-      open(billingUrl, "_top");
+    console.log("fetched pages are", translatedPages)
+  }, [translatedPages])
+  const optionstwo = [
+    { label: "English (United States)", value: "en-us" },
+    { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
+    { label: "Russian", value: "ru" },
+    { label: "Chinese (Taiwan)", value: "zh-tw" },
+    { label: "French (Standard)", value: "fr" },
+  ];
+  useEffect(() => {
+    if (fetchedlanguages)
+      setselectedLanguages(fetchedlanguages.TargetLanguagesCode.split(','))
+  }, [fetchedlanguages])
+  const [isClicked, setIsClicked] = React.useState(false);
+  const [choiceSelected, setChoiceSelected] = useState([]);
+  const titles = [
+    { title: '/404', id: 1 },
+    { title: '/blogs', id: 2 },
+    { title: '/cart', id: 3 },
+    ...pages.pages.map(page => ({ title: '/' + page.title.toString().toLowerCase(), id: page.id }))
+  ];
+  const handleSelectChange = (newSelected) => { console.log(newSelected) }
+  useEffect(() => {
+    let totalWords = 0;
+    choiceSelected.map((value) => {
+      const pageFound = pages.pages.find((val) => val.id === value.id);
+      if (pageFound) {
+        if (!selectedPages.some(page => page.id === pageFound.id)) {
+          setSelectedPages(pages => [...pages, pageFound]);
+        }
+        const strippedHtml = stripHtml(pageFound.body_html).result;
+        totalWords += wordsCount(strippedHtml);
+      }
+    });
+    setWords(totalWords);
+  }, [choiceSelected]);
+  useEffect(() => {
+    console.log(selectedPages)
+  }, [selectedPages])
+  const handleCheckboxChange = (newChecked, data) => {
+    if (newChecked) {
+      setChoiceSelected((prev) => [...prev, data]);
+    } else {
+      const pageFound = pages.pages.find((val) => val.id === data.id);
+      const strippedHtml = stripHtml(pageFound.body_html).result;
+      setWords((prev) => prev - wordsCount(strippedHtml));
+      setSelectedPages((prev) => prev.filter((page) => page.id !== pageFound.id));
+      setChoiceSelected((prev) => prev.filter((choice) => choice.id !== data.id));
     }
-  }, [billingUrl]);
-
-  const generateProduct = () =>
-    submit(
-      { action: "generate" },
-      { replace: true, method: "POST", encType: "application/json" }
-    );
-  const testBilling = () =>
-    submit(
-      { action: "testBilling" },
-      { replace: true, method: "POST", encType: "application/json" }
-    );
+  };
+  const translatePages = () => {
+    setShowSummary(true);
+    console.log("i am being clicked");
+  };
   return (
-    <Page>
-      <ui-title-bar title="Remix app template">
-        <button variant="primary" onClick={generateProduct}>
-          Generate a product
-        </button>
-      </ui-title-bar>
-      <VerticalStack gap="5">
-        <Layout>
-          <Layout.Section>
-            <Card>
-              <VerticalStack gap="5">
-                <VerticalStack gap="2">
-                  <Text as="h2" variant="headingMd">
-                    Congrats on creating a new Shopify Translation app 🎉
+    <Page
+      fullWidth>
+      {
+        showSummary ? <Humansummary totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} pages={selectedPages} /> : <> <div style={{ height: '70px' }}>
+          <Card>
+            <div className='header-section'>
+              <span className='back-arrow-container'>
+                <Link to={location.state?.prevurl ? location.state.prevurl : ""}>
+                  <Icon
+                    source={MobileBackArrowMajor}
+                    tone="base"
+                  /></Link></span>
+              <div className="navLinks">
+                <Link to="/app" state={{ prevurl: "/app" }} style={{
+                  borderBottom: location.pathname === '/app' ? '2px solid #00805F' : 'none',
+                }}>Page</Link>
+                <Link to="/app/showproduct" state={{ prevurl: "/app" }}>Product</Link>
+                <Link to="/app/settings" state={{ prevurl: "/app" }}>Setting</Link>
+              </div>
+            </div>
+          </Card>
+        </div>
+          <Grid columns={{ sm: 1, lg: 4 }}
+            areas={{
+              sm: [
+                'sidebar',
+                'maincontent',
+              ],
+              lg: [
+                'sidebar maincontent maincontent maincontent'
+              ],
+            }}>
+            <Grid.Cell area="sidebar">
+              <Card>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px;" }}>
+                  {titles.map((data, index) => (
+                    <Checkbox
+                      key={index}
+                      label={data.title}
+                      checked={choiceSelected.some(choice => choice.id === data.id)}
+                      onChange={(newChecked) => {
+                        handleCheckboxChange(newChecked, data);
+                      }}
+                    />
+                  ))}
+                </div>
+              </Card>
+            </Grid.Cell>
+            <Grid.Cell area='maincontent'>
+              <Card>
+                <Text variant="headingMd" as="h1">
+                  Lorem ipsum dolor sit amet
+                </Text>
+                <Text fontWeight="regular" variant="headingSm" as="p">
+                  Lorem ipsum dolor sit amet
+                </Text>
+                <HorizontalStack>
+                  {
+                    selectedLanguages.map(lang => {
+                      const option = optionstwo.find(option => option.value === lang);
+                      return option ?
+                        <Tag
+                          onRemove={() => {
+                            const updatedLanguages = selectedLanguages.filter(selectedLang => selectedLang !== lang);
+                            setselectedLanguages(updatedLanguages);
+                          }}
+                        >
+                          {option.label}
+                        </Tag> : null;
+                    })
+                  }
+                </HorizontalStack>
+
+                <Text variant="headingMd" as="h1">
+                  Total words
+                </Text>
+                <div id="totalbutton">
+                  <Text fontWeight="regular" variant="headingSm" as="p">
+                    {words}
                   </Text>
-                  <Text variant="bodyMd" as="p">
-                    This embedded app template uses{" "}
-                    <Link
-                      url="https://shopify.dev/docs/apps/tools/app-bridge"
-                      target="_blank"
-                    >
-                      App Bridge
-                    </Link>{" "}
-                    interface examples like an{" "}
-                    <Link url="/app/additional">
-                      additional page in the app nav
-                    </Link>
-                    , as well as an{" "}
-                    <Link
-                      url="https://shopify.dev/docs/api/admin-graphql"
-                      target="_blank"
-                    >
-                      Admin GraphQL
-                    </Link>{" "}
-                    mutation demo, to provide a starting point for app
-                    development.
-                  </Text>
-                </VerticalStack>
-                <VerticalStack gap="2">
-                  <Text as="h3" variant="headingMd">
-                    Get started with products
-                  </Text>
-                  <Text as="p" variant="bodyMd">
-                    Generate a product with GraphQL and get the JSON output for
-                    that product. Learn more about the{" "}
-                    <Link
-                      url="https://shopify.dev/docs/api/admin-graphql/latest/mutations/productCreate"
-                      target="_blank"
-                    >
-                      productCreate
-                    </Link>{" "}
-                    mutation in our API references.
-                  </Text>
-                </VerticalStack>
-                <HorizontalStack gap="3" align="end">
-                  {actionData?.product && (
+                  {isClicked ? (
+                    ``
+                  ) : (
                     <Button
-                      url={`https://admin.shopify.com/store/${shop}/admin/products/${productId}`}
-                      target="_blank"
+                      onClick={() => setIsClicked(true)}
+                      textAlign="center"
+                      primary="true"
+                      disabled={choiceSelected.length < 1}
                     >
-                      View product
+                      Next
                     </Button>
                   )}
-                  <Button loading={isLoading} primary onClick={generateProduct}>
-                    Generate a product
-                  </Button>
-                  <Button primary onClick={testBilling}>
-                    Test Billing
-                  </Button>
-                </HorizontalStack>
-                {actionData?.product && (
-                  <Box
-                    padding="4"
-                    background="bg-subdued"
-                    borderColor="border"
-                    borderWidth="1"
-                    borderRadius="2"
-                    overflowX="scroll"
-                  >
-                    <pre style={{ margin: 0 }}>
-                      <code>{JSON.stringify(actionData.product, null, 2)}</code>
-                    </pre>
-                  </Box>
-                )}
-              </VerticalStack>
-            </Card>
-          </Layout.Section>
-          <Layout.Section secondary>
-            <VerticalStack gap="5">
-              <Card>
-                <VerticalStack gap="2">
-                  <Text as="h2" variant="headingMd">
-                    App template specs
-                  </Text>
-                  <VerticalStack gap="2">
-                    <Divider />
-                    <HorizontalStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        App Pages List
-                      </Text>
-                      <Link url="/app/dev">See All</Link>
-                    </HorizontalStack>
-                    <Divider />
-                    <HorizontalStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        Framework
-                      </Text>
-                      <Link url="https://remix.run" target="_blank">
-                        Remix
-                      </Link>
-                    </HorizontalStack>
-                    <Divider />
-                    <HorizontalStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        Database
-                      </Text>
-                      <Link url="https://www.prisma.io/" target="_blank">
-                        Prisma
-                      </Link>
-                    </HorizontalStack>
-                    <Divider />
-                    <HorizontalStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        Interface
-                      </Text>
-                      <span>
-                        <Link url="https://polaris.shopify.com" target="_blank">
-                          Polaris
-                        </Link>
-                        {", "}
-                        <Link
-                          url="https://shopify.dev/docs/apps/tools/app-bridge"
-                          target="_blank"
+                </div>
+              </Card>
+
+              {isClicked ? (
+                <div id="secondcard">
+                  <Card>
+                    <ChoiceList
+                      title="Select Translator"
+                      choices={[
+                        {
+                          label: "Artificial Intelligence",
+                          value: "AI",
+                          helpText: " Lorem ipsum dolor sit amet",
+                        },
+                        {
+                          label: "Human",
+                          value: "Human",
+                          helpText: " Lorem ipsum dolor sit amet",
+                        },
+                      ]}
+                      selected={selected}
+                      onChange={handleChange}
+                    />
+                    {secondclicked ? (
+                      <div id="secondcardbutton">
+                        <Button
+                          onClick={translatePages}
+                          textAlign="center"
+                          primary="true"
                         >
-                          App Bridge
-                        </Link>
-                      </span>
-                    </HorizontalStack>
-                    <Divider />
-                    <HorizontalStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        API
-                      </Text>
-                      <Link
-                        url="https://shopify.dev/docs/api/admin-graphql"
-                        target="_blank"
-                      >
-                        GraphQL API
-                      </Link>
-                    </HorizontalStack>
-                  </VerticalStack>
-                </VerticalStack>
-              </Card>
-              <Card>
-                <VerticalStack gap="2">
-                  <Text as="h2" variant="headingMd">
-                    Next steps
-                  </Text>
-                  <List spacing="extraTight">
-                    <List.Item>
-                      Build an{" "}
-                      <Link
-                        url="https://shopify.dev/docs/apps/getting-started/build-app-example"
-                        target="_blank"
-                      >
-                        {" "}
-                        example app
-                      </Link>{" "}
-                      to get started
-                    </List.Item>
-                    <List.Item>
-                      Explore Shopify’s API with{" "}
-                      <Link
-                        url="https://shopify.dev/docs/apps/tools/graphiql-admin-api"
-                        target="_blank"
-                      >
-                        GraphiQL
-                      </Link>
-                    </List.Item>
-                  </List>
-                </VerticalStack>
-              </Card>
-            </VerticalStack>
-          </Layout.Section>
-        </Layout>
-      </VerticalStack>
+                          Next
+                        </Button>
+                      </div>
+                    ) : (
+                      ``
+                    )}
+                  </Card>
+                </div>
+              ) : (
+                ""
+              )}
+            </Grid.Cell>
+          </Grid></>
+      }
+      {
+        translatedPages && translatedPages.length > 0 && (
+          translatedPages.map(translatedPage => {
+            const page = pages.pages.find(page => page.id.toString() === translatedPage.pageId.toString());
+            if (selectedPages.some(selectedPage => selectedPage.id === page.id)) {
+              console.log("current page", page, "current translatedPage", translatedPage);
+
+              return (
+                <Card key={translatedPage.id}>
+                  <div className="pages-data">
+                    <h1 className='page-title'>{page.title}</h1>
+                    <p className='Language'>Language: {translatedPage.language}</p>
+                    <p className='html-data'>Translation: {translatedPage.translation.substring(0, 500) + '...'}</p>
+                    <Button>Show more</Button>
+                  </div>
+                </Card>
+              );
+            } else {
+              return null;
+            }
+          })
+        )
+      }
     </Page>
   );
-}
+};
+export default showpageword;

@@ -170,8 +170,8 @@ export default class Shop {
   async getPlansWordCount() {
     await this.getShop()
     if (this.shop) {
-      return this.PLANS[this.shop.plan].wordsCount;
-
+      if (this.shop.plan)
+        return this.PLANS[this.shop.plan].wordsCount;
     }
     else
       return null
@@ -198,6 +198,51 @@ export default class Shop {
         }
       })
       return storeWord
+    }
+  }
+  async deleteMany() {
+    await this.getShop()
+    if (this.shop) {
+      const deleted = await prisma.shop.delete({
+        where: {
+          id: this.shop.id
+        }
+      })
+      return deleted
+    }
+  }
+  async saveTranslations(pages) {
+    try {
+      await this.getShop()
+      if (this.shop) {
+        for (let page of pages) {
+          await prisma.page.create({
+            data: {
+              pageId: page.id.toString(),
+              language: page.language,
+              translation: page.data.data.translations[0].translatedText,
+            }
+          });
+        }
+
+      }
+    } catch (error) {
+      console.error("Error saving translations: ", error);
+      throw error;
+    }
+  }
+  async getTranslatedPages() {
+    await this.getShop()
+    if (this.shop) {
+      const translatedpages = await prisma.page.findMany(
+        {
+          distinct: ["pageId", "language"]
+        }
+      )
+      if (translatedpages)
+        return translatedpages
+      else
+        return null
     }
   }
 }

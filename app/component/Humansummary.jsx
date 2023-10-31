@@ -2,10 +2,12 @@ import React, { useEffect } from 'react'
 import { DataTable, Card, Text, Checkbox, IndexTable, Page, Badge, Tag, HorizontalStack, VerticalStack, Button, ChoiceList } from "@shopify/polaris";
 import { useState, useCallback } from 'react';
 import { useActionData, useSubmit } from '@remix-run/react';
-const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount}) => {
+const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products = [], pages = [] }) => {
   const actiondata = useActionData();
   const submit = useSubmit();
   const [checked, setChecked] = useState(false);
+  const [productTranslations, setProductTranslations] = useState([]);
+  const [pagesTranslations, setPagesTranslations] = useState([]);
   const storedWordsResult = actiondata?.storeUsedWords;
   const optionstwo = [
     { label: "English (United States)", value: "en-us" },
@@ -27,9 +29,59 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount}) => {
     [],
   );
   const addwords = useCallback(() => {
-    submit({ totalWords: totalWordCount },
+    if (pages) {
+      pages.forEach((value) => {
+        executeTranslationAPI(value.body_html, targetlanguages, 'html', value.id);
+      });
+    }
+
+    if (products) {
+      products.forEach((product) => {
+        executeTranslationAPI(product.description, targetlanguages, 'text', product.id);
+      });
+    }
+    submit({ totalWords: totalWordCount , action:"TotalWordsCount"},
       { replace: true, method: "POST", encType: "application/json" })
-  }, [submit, totalWordCount])
+  }, [submit, totalWordCount, pages, products, targetlanguages])
+
+  const executeTranslationAPI = (text, languages, format, id) => {
+    shopify.toast.show("Translating Your Page");
+    languages.forEach((language) => {
+      const params = {
+        q: text,
+        target: language,
+        format
+      };
+
+      fetch('https://translation.googleapis.com/language/translate/v2?key=AIzaSyDd4uM6XAcs0lF4PF_qKrK7MtS29qikbCI', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(params)
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (format === 'html') {
+            setPagesTranslations(oldTranslations => [...oldTranslations, {id, language, data}]);
+          } else {
+            setProductTranslations(oldTranslations => [...oldTranslations, {id, language, data}]);
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to translate:', error);
+        });
+    });
+  }
+  useEffect(() => {
+    const translatedpages=pagesTranslations;
+    const transplatedproducts=productTranslations;
+    console.log("translated data", translatedpages);
+    if(translatedpages){
+      submit({ translatedpages: translatedpages, action:"saveTranslation" },
+        { replace: true, method: "POST", encType: "application/json" })
+    }
+  }, [pagesTranslations, productTranslations,submit])
   return (
     <Page>
       <Card>

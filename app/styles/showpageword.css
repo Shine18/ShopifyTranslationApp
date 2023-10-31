@@ -61,3 +61,25 @@ span{
   border: solid 1px #CCCCCC;
   border-radius: 4px;
 }
+.Polaris-Box{
+  margin-block: .5rem;
+}
+.page-title{
+  text-align: center;
+    font-weight: bold;
+    margin-block: 2rem;
+    font-size: 32px;
+}
+.pages-data{
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+}
+.html-data{
+  color: #42474C;
+}
+.Language{
+  font-size:18px;
+}

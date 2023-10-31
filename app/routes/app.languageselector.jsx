@@ -69,7 +69,7 @@ export default function languageselection() {
   useEffect(() => {
     if (storedResult) {
 
-      navigate('/app/showpageword');
+      navigate('/app');
     }
   }, [storedResult]);
 

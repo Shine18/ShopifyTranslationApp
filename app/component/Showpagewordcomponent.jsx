@@ -24,7 +24,7 @@ import { useState, useCallback } from "react";
 import { authenticate } from "~/shopify.server";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData, useLocation } from "@remix-run/react";
-const showpageword = ({ words, selectedLanguages, getShop, WordsCount }) => {
+const showpageword = ({ words, selectedLanguages, getShop, WordsCount, products }) => {
   const location = useLocation();
   const [selected, setSelected] = useState([""]);
   const [secondclicked, setSecondClicked] = React.useState(false);
@@ -46,7 +46,7 @@ const showpageword = ({ words, selectedLanguages, getShop, WordsCount }) => {
   ];
   return (
     <>
-      {lastclicked ? <Humansummary totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} /> : <>
+      {lastclicked ? <Humansummary products={products} totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} /> : <>
         <div style={{ height: '70px' }}>
 
         </div>

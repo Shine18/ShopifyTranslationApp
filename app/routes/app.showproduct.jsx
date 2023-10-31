@@ -98,7 +98,7 @@ export default function showproduct() {
   return (
     <Page
       fullWidth>
-      {nextclicked ? <ShowPageword words={words} selectedLanguages={selectedLanguages} WordsCount={WordsCount} getShop={getShop} /> : <>
+      {nextclicked ? <ShowPageword products={selectedProducts} words={words} selectedLanguages={selectedLanguages} WordsCount={WordsCount} getShop={getShop} /> : <>
         <div style={{ height: '70px' }}>
           <Card>
             <div className='header-section'>
@@ -109,16 +109,16 @@ export default function showproduct() {
                     tone="base"
                   /></Link></span>
               <div className="navLinks">
-                <Link to="/app/showpageword" state={{ prevurl: "/app/showproduct" }} style={{
-                  borderBottom: location.pathname === '/app/showpageword' ? '2px solid #00805F' : 'none',
+                <Link to="/app" state={{ prevurl: "/app" }} style={{
+                  borderBottom: location.pathname === '/app' ? '2px solid #00805F' : 'none',
                 }} >Page</Link>
                 <Link to="/app/showproduct" state={{ prevurl: "/app/showproduct" }}
                   style={{
                     borderBottom: location.pathname === '/app/showproduct' ? '2px solid #00805F' : 'none',
                   }}>Product</Link>
-                <Link to="/app/setting" state={{ prevurl: "/app/showproduct" }}
+                <Link to="/app/settings" state={{ prevurl: "/app/showproduct" }}
                   style={{
-                    borderBottom: location.pathname === '/app/setting' ? '2px solid #00805F' : 'none',
+                    borderBottom: location.pathname === '/app/settings' ? '2px solid #00805F' : 'none',
                   }}>Setting</Link>
               </div>
             </div>

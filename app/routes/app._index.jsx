@@ -83,6 +83,7 @@ const showpageword = () => {
   // }, [storedWordsResult]);
   useEffect(() => {
     console.log("fetched pages are", translatedPages)
+    initiateRedirect(true)
   }, [translatedPages])
   const optionstwo = [
     { label: "English (United States)", value: "en-us" },

@@ -67,12 +67,13 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
           } else {
             setProductTranslations(oldTranslations => [...oldTranslations, {id, language, data}]);
           }
+
         })
         .catch((error) => {
           console.error('Failed to translate:', error);
         });
     });
-    initiateRedirect(true)
+
   }
   useEffect(() => {
     const translatedpages=pagesTranslations;

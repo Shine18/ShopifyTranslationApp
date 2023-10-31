@@ -63,6 +63,7 @@ export async function action({ request }) {
 }
 const showpageword = () => {
   const location = useLocation();
+  const [prevPages, setPrevPages] = useState(translatedPages);
   const navigate = useNavigate();
   const { pages, fetchedlanguages, getShop, WordsCount, translatedPages } = useLoaderData();
   const actiondata = useActionData();
@@ -82,9 +83,11 @@ const showpageword = () => {
   //   setIsClicked(false);
   // }, [storedWordsResult]);
   useEffect(() => {
-    console.log("fetched pages are", translatedPages)
-    initiateRedirect(true)
-  }, [translatedPages])
+    if (translatedPages.length != prevPages.length) {
+      setPrevPages(translatedPages);
+      initiateRedirect(true);
+    }
+  }, [translatedPages,prevPages]);
   const optionstwo = [
     { label: "English (United States)", value: "en-us" },
     { label: "Arabic (Saudi Arabia)", value: "ar-sa" },

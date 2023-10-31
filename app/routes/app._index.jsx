@@ -63,9 +63,9 @@ export async function action({ request }) {
 }
 const showpageword = () => {
   const location = useLocation();
-  const [prevPages, setPrevPages] = useState(translatedPages);
   const navigate = useNavigate();
   const { pages, fetchedlanguages, getShop, WordsCount, translatedPages } = useLoaderData();
+  const [prevPages, setPrevPages] = useState(translatedPages);
   const actiondata = useActionData();
   const storedWordsResult = actiondata?.storeUsedWords;
   const [selected, setSelected] = useState([""]);

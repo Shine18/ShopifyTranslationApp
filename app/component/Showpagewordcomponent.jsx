@@ -20,37 +20,37 @@ import {
 import {
   MobileBackArrowMajor
 } from '@shopify/polaris-icons';
-import styles from "~/styles/showpageword.css";
 import { useState, useCallback } from "react";
 import { authenticate } from "~/shopify.server";
 import { json } from "@remix-run/node";
 import { Link, useLoaderData, useLocation } from "@remix-run/react";
-export const links = () => [{ rel: "stylesheet", href: styles }];
-
-
-const showpageword = () => {
+const showpageword = ({ words, selectedLanguages, getShop, WordsCount, products }) => {
   const location = useLocation();
-  
   const [selected, setSelected] = useState([""]);
   const [secondclicked, setSecondClicked] = React.useState(false);
   const handleChange = useCallback((value) => {
     setSecondClicked(true);
     setSelected(value);
   }, []);
-
+  console.log("my my words", words)
   const [isClicked, setIsClicked] = React.useState(false);
-  const [lastclicked,setLastClicked]=React.useState(false)
+  const [lastclicked, setLastClicked] = React.useState(false)
   const [choiceSelected, setChoiceSelected] = useState([]);
-
   const handleSelectChange = (newSelected) => { console.log(newSelected) }
-
+  const optionstwo = [
+    { label: "English (United States)", value: "en-us" },
+    { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
+    { label: "Russian", value: "ru" },
+    { label: "Chinese (Taiwan)", value: "zh-tw" },
+    { label: "French (Standard)", value: "fr" },
+  ];
   return (
-   <>
-      {lastclicked?<Humansummary></Humansummary>:<>
-      <div style={{ height: '70px' }}>
-      
-      </div>
-    
+    <>
+      {lastclicked ? <Humansummary products={products} totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} /> : <>
+        <div style={{ height: '70px' }}>
+
+        </div>
+
         <Grid.Cell area='maincontent'>
           <Card>
             <Text variant="headingMd" as="h1">
@@ -60,10 +60,17 @@ const showpageword = () => {
               Lorem ipsum dolor sit amet
             </Text>
             <HorizontalStack>
-              <Tag onRemove={() => { }}>Russia</Tag>
-              <Tag onRemove={() => { }}>Chinese</Tag>
-              <Tag onRemove={() => { }}>French</Tag>
-              <Tag onRemove={() => { }}>Italian</Tag>
+              <div className="component-pgwordtag">
+                {
+                  selectedLanguages.map(lang => {
+                    const option = optionstwo.find(option => option.value === lang);
+                    return option ?
+                      <Tag>
+                        {option.label}
+                      </Tag> : null;
+                  })
+                }
+              </div>
             </HorizontalStack>
 
             <Text variant="headingMd" as="h1">
@@ -71,7 +78,7 @@ const showpageword = () => {
             </Text>
             <div id="totalbutton">
               <Text fontWeight="regular" variant="headingSm" as="p">
-                1200
+                {words}
               </Text>
               {isClicked ? (
                 ``
@@ -94,14 +101,14 @@ const showpageword = () => {
                   title="Company name"
                   choices={[
                     {
-                      label: "Hidden",
-                      value: "hidden",
-                      helpText: "Company name will be hidden.",
+                      label: "Artificial Intelligence",
+                      value: "AI",
+                      helpText: " Lorem ipsum dolor sit amet",
                     },
                     {
-                      label: "Optional",
-                      value: "optional",
-                      helpText: "Company name will be optional.",
+                      label: "Human",
+                      value: "Human",
+                      helpText: " Lorem ipsum dolor sit amet",
                     },
                   ]}
                   selected={selected}
@@ -127,8 +134,8 @@ const showpageword = () => {
           )}
         </Grid.Cell>
       </>}
-    
-        </>   
+
+    </>
   );
 };
 export default showpageword;

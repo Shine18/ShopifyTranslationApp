@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:dev.sqlite"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model Session {
@@ -27,6 +28,7 @@ model Shop {
   plan                 Int?
   baseLanguageCode     String?
   TargetLanguagesCode  String?
+  wordsUsed            Int?   @default(0)
 }
 
 model Charge {
@@ -37,3 +39,10 @@ model Charge {
   status          String @default("PENDING")
 }
 
+model Page{
+  id             Int     @id @default(autoincrement())
+  pageId         String
+  language       String
+  translation    String
+
+}

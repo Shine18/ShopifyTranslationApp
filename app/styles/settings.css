@@ -1,37 +1,59 @@
 #firstcardupdate{
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
 }
 #firstcardupdate .Polaris-Button{
-    width: 7rem;
+  width: 7rem;
 }
 #firstcardfirstsection .Polaris-Checkbox__Backdrop:before{
-    background-color: #008060;
+  background-color: #008060;
 }
 #firstcardfirstsection{
-    padding-top: 0.5rem;
+  padding-top: 0.5rem;
 }
 #firstcardsecondsection{
-    padding-top: 0.5rem;
+  padding-top: 0.5rem;
 }
 #firstcardfirstsection .Polaris-Text--root{
-    padding-top: 0.3rem;
+  padding-top: 0.3rem;
 }
 #firstcardsecondsection .Polaris-Text--root{
-    padding-top: 0.3rem;
+  padding-top: 0.3rem;
 }
 #tags{
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    padding-top: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
 }
 
 #secondcarddiv{
-    margin-top: 0.5rem;
+  margin-top: 0.5rem;
 }
 #lastselect{
-    width: 20%;
+  width: 20%;
 
+}
+.navLinks{
+display: flex;
+gap: 20px;
+align-items: center;
+}
+.navLinks a{
+text-decoration: none;
+color: #42474C;
+font-weight: semi-bold;
+}
+.header-section{
+display:flex;
+flex-direction: row;
+gap: 40px;
+}
+.back-arrow-container{
+border: solid 1px #CCCCCC;
+border-radius: 4px;
+}
+.Polaris-Box{
+margin-bottom: .5rem;
 }

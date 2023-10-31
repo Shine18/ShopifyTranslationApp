@@ -76,10 +76,10 @@ const showpageword = () => {
     setSecondClicked(true);
     setSelected(value);
   }, []);
-  useEffect(() => {
-    setShowSummary(false);
-    setIsClicked(false);
-  }, [storedWordsResult]);
+  // useEffect(() => {
+  //   setShowSummary(false);
+  //   setIsClicked(false);
+  // }, [storedWordsResult]);
   useEffect(() => {
     console.log("fetched pages are", translatedPages)
   }, [translatedPages])

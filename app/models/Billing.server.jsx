@@ -81,8 +81,8 @@ export async function createCharge(shop, graphql, plan) {
   );
   const subscriptionData = await response.json()
 
-  const { id } = subscriptionData?.data?.appSubscriptionCreate?.appSubscription
-  const { confirmationUrl } = subscriptionData?.data?.appSubscriptionCreate
+  const  id  = subscriptionData?.data?.appSubscriptionCreate?.appSubscription?.id
+  const confirmationUrl  = subscriptionData?.data?.appSubscriptionCreate?.confirmationUrl
 
   if (id && confirmationUrl) {
     return {

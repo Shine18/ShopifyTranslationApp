@@ -188,7 +188,7 @@ export default class Shop {
           wordsUsed: true
         }
       })
-      const newWordsUsed = existingWord.wordsUsed + usedWords
+      const newWordsUsed = existingWord?.wordsUsed + usedWords
       const storeWord = await prisma.shop.update({
         where: {
           id: this.shop.id
@@ -231,6 +231,9 @@ export default class Shop {
       throw error;
     }
   }
+  async saveTranslationProduct(transplatedproducts) {
+    console.log("translated products", transplatedproducts)
+  }
   async getTranslatedPages() {
     await this.getShop()
     if (this.shop) {
@@ -243,6 +246,92 @@ export default class Shop {
         return translatedpages
       else
         return null
+    }
+  }
+  async savePageHumanTranslation(pagetostore) {
+    await this.getShop();
+    console.log("this is the shop", this.shop, pagetostore);
+    let response;
+    if (this.shop) {
+      const existingRecord = await prisma.humanPageStore.findFirst({
+        where: {
+          pageId: pagetostore.id.toString(),
+          shop: this.shop.shop
+        },
+      });
+
+      if (existingRecord) {
+        const updatedPage = await prisma.humanPageStore.update({
+          where: {
+            id: existingRecord.id,
+          },
+          data: {
+            shop: this.shop.shop,
+            baseLanguageCode: this.shop.baseLanguageCode?.toString(),
+            TargetLanguagesCode: pagetostore.targetlanguages.toString(),
+            pageId: pagetostore.id.toString(),
+            pageData: pagetostore.page,
+          },
+        });
+        response = "Updated page record";
+        return response;
+      } else {
+        const newPage = await prisma.humanPageStore.create({
+          data: {
+            shop: this.shop.shop,
+            baseLanguageCode: this.shop.baseLanguageCode ? this.shop.baseLanguageCode?.toString() : "en-us",
+            TargetLanguagesCode: pagetostore.targetlanguages.toString(),
+            pageId: pagetostore.id.toString(),
+            pageData: pagetostore.page,
+          },
+        });
+
+        response = "Created new page record";
+        return response;
+      }
+    }
+  }
+  async saveProductHumanTranslation(producttostore) {
+    await this.getShop();
+    console.log("this is the shop", this.shop, producttostore);
+    let response;
+    if (this.shop) {
+      const existingRecord = await prisma.humanProductStore.findFirst({
+        where: {
+          productId: producttostore.id.toString(),
+          shop: this.shop.shop
+        },
+      });
+
+      if (existingRecord) {
+        const updatedProduct = await prisma.humanProductStore.update({
+          where: {
+            id: existingRecord.id,
+          },
+          data: {
+            shop: this.shop.shop,
+            baseLanguageCode: this.shop.baseLanguageCode?.toString(),
+            TargetLanguagesCode: producttostore.targetlanguages.toString(),
+            productId: producttostore.id.toString(),
+            productData: producttostore.product,
+          },
+        });
+        response = "Updated Product record";
+        return response;
+      } else {
+        const newPage = await prisma.humanProductStore.create({
+          data: {
+            shop: this.shop.shop,
+            baseLanguageCode: this.shop.baseLanguageCode ? this.shop.baseLanguageCode?.toString() : "en-us",
+            TargetLanguagesCode: producttostore.targetlanguages.toString(),
+            productId: producttostore.id.toString(),
+            productData: producttostore.product,
+          },
+        });
+
+        response = "Created new product record";
+        return response;
+      }
     }
   }
 }

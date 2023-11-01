@@ -32,7 +32,6 @@ const showpageword = ({ words, selectedLanguages, getShop, WordsCount, products 
     setSecondClicked(true);
     setSelected(value);
   }, []);
-  console.log("my my words", words)
   const [isClicked, setIsClicked] = React.useState(false);
   const [lastclicked, setLastClicked] = React.useState(false)
   const [choiceSelected, setChoiceSelected] = useState([]);
@@ -46,7 +45,7 @@ const showpageword = ({ words, selectedLanguages, getShop, WordsCount, products 
   ];
   return (
     <>
-      {lastclicked ? <Humansummary products={products} totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} /> : <>
+      {lastclicked ? <Humansummary translationmode={selected} products={products} totalwords={words} targetlanguages={selectedLanguages}  WordsCount={WordsCount} /> : <>
         <div style={{ height: '70px' }}>
 
         </div>

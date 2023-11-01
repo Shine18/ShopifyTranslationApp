@@ -39,10 +39,28 @@ model Charge {
   status          String @default("PENDING")
 }
 
-model Page{
+model Page {
   id             Int     @id @default(autoincrement())
   pageId         String
   language       String
   translation    String @db.LongText
 
+}
+
+model HumanPageStore {
+  id                   Int @id @default(autoincrement())
+  shop                 String
+  baseLanguageCode     String
+  TargetLanguagesCode  String
+  pageId               String
+  pageData             String @db.LongText
+
+}
+model HumanProductStore {
+  id                      Int @id @default(autoincrement())
+  shop                    String
+  baseLanguageCode        String
+  TargetLanguagesCode     String
+  productId               String
+  productData             String @db.LongText
 }

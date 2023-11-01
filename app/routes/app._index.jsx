@@ -48,17 +48,22 @@ export async function loader({ request }) {
 export async function action({ request }) {
   const { session, admin } = await authenticate.admin(request);
   const shop = new Shop(session.shop, admin.graphql);
-  const { totalWords, translatedpages, action } = await request.json();
+  const { totalWords, translatedpages, pagetostore, action } = await request.json();
   let storeUsedWords;
   let translatedresponse;
+  let storepage;
   if (action === "TotalWordsCount") {
     storeUsedWords = await shop.addWordsUsage(totalWords);
   }
   if (action === "saveTranslation") {
-    translatedresponse = shop.saveTranslations(translatedpages);
+    translatedresponse = await shop.saveTranslations(translatedpages);
+  }
+  if (action === "store-page") {
+    storepage = await shop.savePageHumanTranslation(pagetostore);
   }
   return json({
     storeUsedWords,
+    storepage
   });
 }
 const showpageword = () => {
@@ -68,8 +73,10 @@ const showpageword = () => {
   const [prevPages, setPrevPages] = useState(translatedPages);
   const actiondata = useActionData();
   const storedWordsResult = actiondata?.storeUsedWords;
+  const storepage = actiondata?.storepage;
   const [selected, setSelected] = useState([""]);
   const [selectedPages, setSelectedPages] = useState([]);
+  const [selectedMode, setSelectedMode] = useState("");
   const [secondclicked, setSecondClicked] = React.useState(false);
   const [selectedLanguages, setselectedLanguages] = useState([])
   const [showSummary, setShowSummary] = useState(false);
@@ -77,17 +84,17 @@ const showpageword = () => {
   const handleChange = useCallback((value) => {
     setSecondClicked(true);
     setSelected(value);
+    setSelectedMode(value);
   }, []);
-  // useEffect(() => {
-  //   setShowSummary(false);
-  //   setIsClicked(false);
-  // }, [storedWordsResult]);
   useEffect(() => {
-    if (translatedPages.length != prevPages.length) {
+    console.log(selectedMode)
+  }, [selectedMode]);
+  useEffect(() => {
+    if (translatedPages.length != prevPages.length || storepage === "Created new page record" || storepage === "Updated page record") {
       setPrevPages(translatedPages);
       initiateRedirect(true);
     }
-  }, [translatedPages,prevPages]);
+  }, [translatedPages, prevPages]);
   const optionstwo = [
     { label: "English (United States)", value: "en-us" },
     { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
@@ -151,7 +158,7 @@ const showpageword = () => {
     <Page
       fullWidth>
       {
-        showSummary ? <Humansummary initiateRedirect={initiateRedirect} totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} pages={selectedPages} /> : <> <div style={{ height: '70px' }}>
+        showSummary ? <Humansummary translationmode={selectedMode} initiateRedirect={initiateRedirect} totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} pages={selectedPages} /> : <> <div style={{ height: '70px' }}>
           <Card>
             <div className='header-section'>
               <span className='back-arrow-container'>

@@ -48,10 +48,22 @@ export async function loader({ request }) {
 export async function action({ request }) {
   const { session, admin } = await authenticate.admin(request);
   const shop = new Shop(session.shop, admin.graphql);
-  const { totalWords } = await request.json();
-  const storeUsedWords = await shop.addWordsUsage(totalWords);
+  const { totalWords, transplatedproducts, producttostore, action } = await request.json();
+  let storeUsedWords;
+  let translatedresponse;
+  let storeproduct;
+  if (action === "TotalWordsCount") {
+    storeUsedWords = await shop.addWordsUsage(totalWords);
+  }
+  if (action === "saveTranslationProduct") {
+    saveTranslationProduct = await shop.saveTranslationProduct(transplatedproducts);
+  }
+  if (action === "store-product") {
+    storeproduct = await shop.saveProductHumanTranslation(producttostore)
+  }
   return json({
     storeUsedWords,
+    storeproduct
   });
 }
 export default function showproduct() {
@@ -64,26 +76,35 @@ export default function showproduct() {
   const [words, setWords] = useState(0);
   const [selectedLanguages, setselectedLanguages] = useState([])
   const storedWordsResult = actiondata?.storeUsedWords;
+  const storeproduct = actiondata?.storeproduct;
   useEffect(() => {
-    setNextClicked(false);
-  }, [storedWordsResult]);
+    if (storeproduct === "Created new product record" || storeproduct === "Updated product record")
+      setNextClicked(false);
+  }, [storeproduct]);
   const navigateTo = function (url) {
     open(url, "_blank");
   };
+  useEffect(() => {
+    console.log("list of products", selectedProducts)
+  }, [selectedProducts])
   useEffect(() => {
     if (fetchedlanguages)
       setselectedLanguages(fetchedlanguages.TargetLanguagesCode.split(','))
   }, [fetchedlanguages])
   const selectProduct = function (product) {
-    console.log("this is the selected product", product);
-
-    if (!selectedProducts.some((item) => item.node.id === product.node.id)) {
+    const productIndex = selectedProducts.findIndex((item) => item.node.id === product.node.id);
+    if (productIndex === -1) {
       setSelectedProducts((prevProducts) => [...prevProducts, product]);
-      const calculatedWords = wordsCount(product.node.description)
-      setWords(words => words + calculatedWords)
-    }
-    else {
-      setSelectedProducts((prevProducts) => prevProducts.filter((p) => p.node.id !== product.node.id));
+      const calculatedWords = wordsCount(product.node.description);
+      setWords(words => words + calculatedWords);
+    } else {
+      setSelectedProducts((prevProducts) => {
+        const updatedProducts = [...prevProducts];
+        updatedProducts.splice(productIndex, 1);
+        return updatedProducts;
+      });
+      const calculatedWords = wordsCount(product.node.description);
+      setWords(words => words - calculatedWords);
     }
   };
   const handleChange = useCallback((newChecked) => {

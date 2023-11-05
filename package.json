@@ -3,8 +3,8 @@
   "private": true,
   "scripts": {
     "build": "NODE_ENV=production remix build",
-    "postinstall": "prisma generate && prisma migrate deploy && prisma db push",
-    "predev": "prisma generate && prisma migrate deploy",
+    "postinstall": "prisma generate && prisma db push --force-reset --preview-feature",
+    "predev": "prisma generate && prisma db push --force-reset --preview-feature",
     "dev": "shopify app dev",
     "config:link": "shopify app config link",
     "config:push": "shopify app config push",

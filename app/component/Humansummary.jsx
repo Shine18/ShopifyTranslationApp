@@ -116,7 +116,8 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
         });
 
     }
-    initiateRedirect()
+    console.log("initiating redirect..")
+    initiateRedirect(true)
     // languages.forEach((language) => {
 
     // });

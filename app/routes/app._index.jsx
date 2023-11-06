@@ -101,7 +101,7 @@ const showpageword = () => {
 
   useEffect(() => {
     console.log("getting translations", translated)
-    setTranslatedPages2(translated)
+    setTranslatedPages2(translated.translated)
   }, [translated])
   useEffect(() => {
     console.log(selectedMode)
@@ -159,6 +159,7 @@ const showpageword = () => {
       setSelectedPages((prev) => prev.filter((page) => page.id !== pageFound.id));
       setChoiceSelected((prev) => prev.filter((choice) => choice.id !== data.id));
     }
+    console.log('calling server')
     submit({  action: "getTrans" },
         { replace: true, method: "POST", encType: "application/json" })
   };

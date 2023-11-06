@@ -149,7 +149,6 @@ const showpageword = () => {
   };
   const initiateRedirect = (val) => {
     if (val) {
-      console.log("brwaaaaaaaaa222222222222222")
       setShowSummary(false);
       setIsClicked(false);
     }

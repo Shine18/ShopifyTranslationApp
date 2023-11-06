@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { DataTable, Card, Text, Checkbox, IndexTable, Page, Badge, Tag, HorizontalStack, VerticalStack, Button, ChoiceList } from "@shopify/polaris";
 import { useState, useCallback } from 'react';
 import { useActionData, useSubmit } from '@remix-run/react';
-const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products = [], pages = [], translationmode }) => {
+const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products = [], pages = [], translationmode, initiateRedirect }) => {
   const actiondata = useActionData();
   const submit = useSubmit();
   const [checked, setChecked] = useState(false);
@@ -85,16 +85,16 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
     }
   }, [submit, totalWordCount, pages, products, targetlanguages, translationmode])
 
-  const executeTranslationAPI = (text, languages, format, id) => {
+  const executeTranslationAPI = async (text, languages, format, id) => {
     shopify.toast.show("Translating Your Page");
-    languages.forEach((language) => {
+    for( var language of languages) {
       const params = {
         q: text,
         target: language,
         format
       };
 
-      fetch('https://translation.googleapis.com/language/translate/v2?key=AIzaSyDA3RhXOeW-Rk-mexxxYHzYcaQD7FCTILE', {
+      await fetch('https://translation.googleapis.com/language/translate/v2?key=AIzaSyDA3RhXOeW-Rk-mexxxYHzYcaQD7FCTILE', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,12 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
         .catch((error) => {
           console.error('Failed to translate:', error);
         });
-    });
+
+    }
+    initiateRedirect()
+    // languages.forEach((language) => {
+
+    // });
 
   }
   useEffect(() => {

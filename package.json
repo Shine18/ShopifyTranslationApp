@@ -4,7 +4,7 @@
   "scripts": {
     "build": "NODE_ENV=production remix build",
     "postinstall": "prisma generate && prisma db push --force-reset --preview-feature",
-    "predev": "prisma generate && prisma db push --force-reset --preview-feature",
+    "predev": "prisma generate && prisma db push",
     "dev": "shopify app dev",
     "config:link": "shopify app config link",
     "config:push": "shopify app config push",

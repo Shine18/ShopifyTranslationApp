@@ -128,15 +128,15 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
     const transplatedproducts = productTranslations;
     console.log("translated data", translatedpages);
     console.log("translated data product", transplatedproducts);
-    if (translatedpages) {
+    // if (translatedpages.length > 0) {
       submit({ translatedpages: translatedpages, action: "saveTranslation" },
         { replace: true, method: "POST", encType: "application/json" })
-    }
-    if (transplatedproducts) {
-      submit({ transplatedproducts: transplatedproducts, action: "saveTranslationProduct" },
-      { replace: true, method: "POST", encType: "application/json" })
-    }
-  }, [pagesTranslations, productTranslations, submit])
+    // }
+    // if (transplatedproducts.length > 0) {
+    //   submit({ transplatedproducts: transplatedproducts, action: "saveTranslationProduct" },
+    //   { replace: true, method: "POST", encType: "application/json" })
+    // }
+  }, [pagesTranslations, submit])
   return (
     <Page>
       <Card>

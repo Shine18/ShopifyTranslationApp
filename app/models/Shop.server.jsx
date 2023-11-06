@@ -212,6 +212,7 @@ export default class Shop {
     }
   }
   async saveTranslations(pages) {
+    console.log("saving translation of pages", pages)
     try {
       await this.getShop()
       if (this.shop) {

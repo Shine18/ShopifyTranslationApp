@@ -52,6 +52,7 @@ export async function action({ request }) {
   let storeUsedWords;
   let translatedresponse;
   let storepage;
+  console.log('action called', action)
   if (action === "TotalWordsCount") {
     storeUsedWords = await shop.addWordsUsage(totalWords);
   }

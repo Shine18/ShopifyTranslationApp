@@ -24,7 +24,7 @@ import styles from "~/styles/showpageword.css";
 import { useState, useCallback } from "react";
 import { authenticate } from "~/shopify.server";
 import { json, redirect } from "@remix-run/node";
-import { Link, useActionData, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
+import { Link, useActionData, useLoaderData, useLocation, useNavigate, useSubmit } from "@remix-run/react";
 import { stripHtml } from "string-strip-html";
 import wordsCount from 'words-count';
 import Shop from '~/models/Shop.server';
@@ -61,12 +61,20 @@ export async function action({ request }) {
   if (action === "store-page") {
     storepage = await shop.savePageHumanTranslation(pagetostore);
   }
+
+  if( action === "getTrans") {
+    return json({
+      translated: await shop.getTranslatedPages()
+    })
+  }
   return json({
     storeUsedWords,
     storepage
   });
 }
 const showpageword = () => {
+
+  const submit = useSubmit();
   const location = useLocation();
   const navigate = useNavigate();
   const { pages, fetchedlanguages, getShop, WordsCount, translatedPages } = useLoaderData();
@@ -74,6 +82,7 @@ const showpageword = () => {
   const actiondata = useActionData();
   const storedWordsResult = actiondata?.storeUsedWords;
   const storepage = actiondata?.storepage;
+  const translated = actiondata?.translated
   const [selected, setSelected] = useState([""]);
   const [selectedPages, setSelectedPages] = useState([]);
   const [selectedMode, setSelectedMode] = useState("");
@@ -81,11 +90,18 @@ const showpageword = () => {
   const [selectedLanguages, setselectedLanguages] = useState([])
   const [showSummary, setShowSummary] = useState(false);
   const [words, setWords] = useState(0)
+
+  const [translatedPages2, setTranslatedPages2] = useState(translatedPages)
+
   const handleChange = useCallback((value) => {
     setSecondClicked(true);
     setSelected(value);
     setSelectedMode(value);
   }, []);
+
+  useEffect(() => {
+    setTranslatedPages2(translated)
+  }, [translated])
   useEffect(() => {
     console.log(selectedMode)
   }, [selectedMode]);
@@ -142,6 +158,8 @@ const showpageword = () => {
       setSelectedPages((prev) => prev.filter((page) => page.id !== pageFound.id));
       setChoiceSelected((prev) => prev.filter((choice) => choice.id !== data.id));
     }
+    submit({  action: "getTrans" },
+        { replace: true, method: "POST", encType: "application/json" })
   };
   const translatePages = () => {
     setShowSummary(true);
@@ -153,6 +171,8 @@ const showpageword = () => {
       setIsClicked(false);
     }
   }
+
+
   return (
     <Page
       fullWidth>
@@ -291,8 +311,8 @@ const showpageword = () => {
           </Grid></>
       }
       {!showSummary ?
-        translatedPages && translatedPages.length > 0 && (
-          translatedPages.map(translatedPage => {
+        translatedPages2 && translatedPages2.length > 0 && (
+          translatedPages2.map(translatedPage => {
             const page = pages.pages.find(page => page.id.toString() === translatedPage.pageId.toString());
             if (selectedPages.some(selectedPage => selectedPage.id === page.id)) {
               console.log("current page", page, "current translatedPage", translatedPage);

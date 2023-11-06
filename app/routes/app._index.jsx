@@ -100,6 +100,7 @@ const showpageword = () => {
   }, []);
 
   useEffect(() => {
+    console.log("getting translations", translated)
     setTranslatedPages2(translated)
   }, [translated])
   useEffect(() => {

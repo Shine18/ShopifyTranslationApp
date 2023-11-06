@@ -303,7 +303,7 @@ const showpageword = () => {
                   <div className="pages-data">
                     <h1 className='page-title'>{page.title}</h1>
                     <p className='Language'>Language: {translatedPage.language}</p>
-                    <p className='html-data'>Translation: {translatedPage.translation.substring(0, 500) + '...'}</p>
+                    <p className='html-data' dangerouslySetInnerHTML={{ __html: translatedPage.translation }} ></p>
                     <Button>Show more</Button>
                   </div>
                 </Card>

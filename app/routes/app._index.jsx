@@ -101,7 +101,7 @@ const showpageword = () => {
 
   useEffect(() => {
     console.log("getting translations", translated)
-    setTranslatedPages2(translated.translated)
+    setTranslatedPages2(translated)
   }, [translated])
   useEffect(() => {
     console.log(selectedMode)

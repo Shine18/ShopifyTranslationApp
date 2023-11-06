@@ -3,7 +3,7 @@ import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
 import { Button, Page, Grid, ButtonGroup, Card, Text, HorizontalStack, VerticalStack } from "@shopify/polaris";
 import Shop, { PLANS } from "~/models/Shop.server";
-import { useActionData, useLoaderData, useSubmit } from "@remix-run/react";
+import { useActionData, useLoaderData, useSubmit, useNavigate } from "@remix-run/react";
 import { useCallback, useEffect } from "react";
 
 
@@ -48,7 +48,7 @@ export async function action({ request }) {
 export default function SelectPlanRoute() {
   const { currentPlan, PLANS } = useLoaderData()
   const actionData = useActionData()
-
+  const navigate = useNavigate()
   const submit = useSubmit()
 
   // incoming server's action response
@@ -56,6 +56,7 @@ export default function SelectPlanRoute() {
   useEffect(() => {
     if (newPlan) {
       shopify.toast.show(`Plan changed to ${newPlan.title}`)
+      navigate("/app/languageselector");
     }
   }, [newPlan])
 

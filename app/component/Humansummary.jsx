@@ -94,7 +94,7 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
         format
       };
 
-      fetch('https://translation.googleapis.com/language/translate/v2?key=AIzaSyDd4uM6XAcs0lF4PF_qKrK7MtS29qikbCI', {
+      fetch('https://translation.googleapis.com/language/translate/v2?key=AIzaSyDA3RhXOeW-Rk-mexxxYHzYcaQD7FCTILE', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

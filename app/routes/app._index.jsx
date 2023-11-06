@@ -180,7 +180,7 @@ const showpageword = () => {
     <Page
       fullWidth>
       {
-        showSummary ? <Humansummary translationmode={selectedMode} initiateRedirect={initiateRedirect} totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} pages={selectedPages} /> : <> <div style={{ height: '70px' }}>
+        showSummary ? <Humansummary translatonPage={true} translationmode={selectedMode} initiateRedirect={initiateRedirect} totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} pages={selectedPages} /> : <> <div style={{ height: '70px' }}>
           <Card>
             <div className='header-section'>
               <span className='back-arrow-container'>

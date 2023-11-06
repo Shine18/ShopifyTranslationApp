@@ -56,14 +56,16 @@ export async function action({ request }) {
     storeUsedWords = await shop.addWordsUsage(totalWords);
   }
   if (action === "saveTranslationProduct") {
-    saveTranslationProduct = await shop.saveTranslationProduct(transplatedproducts);
+
+    translatedresponse = await shop.saveTranslationProduct(transplatedproducts);
   }
   if (action === "store-product") {
     storeproduct = await shop.saveProductHumanTranslation(producttostore)
   }
   return json({
     storeUsedWords,
-    storeproduct
+    storeproduct,
+    translatedresponse
   });
 }
 export default function showproduct() {
@@ -77,10 +79,11 @@ export default function showproduct() {
   const [selectedLanguages, setselectedLanguages] = useState([])
   const storedWordsResult = actiondata?.storeUsedWords;
   const storeproduct = actiondata?.storeproduct;
+  const translatedresponse = actiondata?.translatedresponse
   useEffect(() => {
-    if (storeproduct === "Created new product record" || storeproduct === "Updated product record")
+    if (storeproduct === "Created new product record" || storeproduct === "Updated product record" || translatedresponse === "product translation uploaded")
       setNextClicked(false);
-  }, [storeproduct]);
+  }, [storeproduct, translatedresponse]);
   const navigateTo = function (url) {
     open(url, "_blank");
   };
@@ -119,7 +122,7 @@ export default function showproduct() {
   return (
     <Page
       fullWidth>
-      {nextclicked ? <ShowPageword products={selectedProducts} words={words} selectedLanguages={selectedLanguages} WordsCount={WordsCount} getShop={getShop} /> : <>
+      {nextclicked ? <ShowPageword productPage={true} products={selectedProducts} words={words} selectedLanguages={selectedLanguages} WordsCount={WordsCount} getShop={getShop} /> : <>
         <div style={{ height: '70px' }}>
           <Card>
             <div className='header-section'>

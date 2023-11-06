@@ -234,7 +234,37 @@ export default class Shop {
   }
   async saveTranslationProduct(transplatedproducts) {
     console.log("translated products", transplatedproducts)
+    try {
+      await this.getShop();
+      if (this.shop) {
+        for (let product of transplatedproducts) {
+
+          const existingProduct = await prisma.product.findFirst({
+            where: {
+              productId: product.id.toString(),
+              language: product.language,
+            }
+          });
+
+
+          if (!existingProduct) {
+            await prisma.product.create({
+              data: {
+                productId: product.id.toString(),
+                language: product.language,
+                translation: product.data.data.translations[0].translatedText,
+              }
+            });
+            return "product translation uploaded"
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error saving translations: ", error);
+      throw error;
+    }
   }
+
   async getTranslatedPages() {
     await this.getShop()
     if (this.shop) {

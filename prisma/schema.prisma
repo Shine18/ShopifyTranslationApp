@@ -47,6 +47,14 @@ model Page {
 
 }
 
+model Product {
+  id             Int     @id @default(autoincrement())
+  productId      String
+  language       String
+  translation    String @db.LongText
+
+}
+
 model HumanPageStore {
   id                   Int @id @default(autoincrement())
   shop                 String

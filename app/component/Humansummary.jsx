@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { DataTable, Card, Text, Checkbox, IndexTable, Page, Badge, Tag, HorizontalStack, VerticalStack, Button, ChoiceList } from "@shopify/polaris";
 import { useState, useCallback } from 'react';
 import { useActionData, useSubmit } from '@remix-run/react';
-const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products = [], pages = [], translationmode, initiateRedirect }) => {
+const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products = [], pages = [], translationmode, initiateRedirect, translatonPage = false, productPage = false }) => {
   const actiondata = useActionData();
   const submit = useSubmit();
   const [checked, setChecked] = useState(false);
@@ -59,9 +59,9 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
       }
 
       if (products) {
-        console.log("these are products",products)
+        console.log("these are products", products)
         products.forEach((product) => {
-          console.log("single product",product)
+          console.log("single product", product)
           initiateHumanTranslation(product.node.description, targetlanguages, 'product', product.node.id);
         });
       }
@@ -87,7 +87,7 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
 
   const executeTranslationAPI = async (text, languages, format, id) => {
     shopify.toast.show("Translating Your Page");
-    for( var language of languages) {
+    for (var language of languages) {
       const params = {
         q: text,
         target: language,
@@ -107,7 +107,7 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
           if (format === 'html') {
             setPagesTranslations(oldTranslations => [...oldTranslations, { id, language, data }]);
           } else {
-            setProductTranslations(oldTranslations => [...oldTranslations, { id, language, data }]);
+            wrappingProducts(id, language, data)
           }
 
         })
@@ -117,26 +117,28 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
 
     }
     console.log("initiating redirect..")
-    initiateRedirect(true)
-    // languages.forEach((language) => {
-
-    // });
-
+    if (translatonPage) {
+      initiateRedirect(true)
+    }
+  }
+  const wrappingProducts = (id, language, data) => {
+    const newItem = {id, language, data};
+    setProductTranslations(prevItems => [...prevItems, newItem]);
   }
   useEffect(() => {
     const translatedpages = pagesTranslations;
     const transplatedproducts = productTranslations;
     console.log("translated data", translatedpages);
     console.log("translated data product", transplatedproducts);
-    // if (translatedpages.length > 0) {
+    if (translatonPage) {
       submit({ translatedpages: translatedpages, action: "saveTranslation" },
         { replace: true, method: "POST", encType: "application/json" })
-    // }
-    // if (transplatedproducts.length > 0) {
-    //   submit({ transplatedproducts: transplatedproducts, action: "saveTranslationProduct" },
-    //   { replace: true, method: "POST", encType: "application/json" })
-    // }
-  }, [pagesTranslations, submit])
+    }
+    if (productPage) {
+      submit({ transplatedproducts: transplatedproducts, action: "saveTranslationProduct" },
+        { replace: true, method: "POST", encType: "application/json" })
+    }
+  }, [pagesTranslations, submit,productTranslations,productPage,translatonPage])
   return (
     <Page>
       <Card>

@@ -71,6 +71,7 @@ export async function action({ request }) {
 export default function showproduct() {
   const location = useLocation();
   const actiondata = useActionData();
+  const navigate = useNavigate();
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [checked, setChecked] = useState(false);
   const [nextclicked, setNextClicked] = useState(false);
@@ -166,10 +167,11 @@ export default function showproduct() {
                 portrait={true}
                 title={product.node.title}
                 secondaryAction={{
-                  content: "View Product On Store",
+                  content: "View Product",
                   onAction: () => {
-                    navigateTo(
-                      `https://${shopurl}/products/${product.node.handle}`
+                    const id = product.node.id.replace(/\D/g,'');
+                    navigate(
+                      `/app/${id}`
                     );
                   },
                 }}

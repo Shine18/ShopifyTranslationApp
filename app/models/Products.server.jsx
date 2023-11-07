@@ -35,4 +35,34 @@ export default class Product {
       console.log(e);
     }
   }
+  async getProductById(productId) {
+    try {
+      const response = await this.graphql(`
+      query {
+        node(id: "${productId}") {
+          ... on Product {
+            id
+            title
+            description
+            handle
+            images(first:1) {
+              edges {
+                node {
+                  originalSrc
+                }
+              }
+            }
+          }
+        }
+      }
+    `);
+      const data = await response.json();
+      console.log("this is single product data", data);
+      return data;
+    } catch (e) {
+      console.log("Error occurred:");
+      console.log(e);
+    }
+  }
+
 }

@@ -217,21 +217,32 @@ export default class Shop {
       await this.getShop()
       if (this.shop) {
         for (let page of pages) {
-          await prisma.page.create({
-            data: {
+
+          const existingPage = await prisma.page.findFirst({
+            where: {
               pageId: page.id.toString(),
               language: page.language,
-              translation: page.data.data.translations[0].translatedText,
             }
           });
-        }
 
+
+          if (!existingPage) {
+            await prisma.page.create({
+              data: {
+                pageId: page.id.toString(),
+                language: page.language,
+                translation: page.data.data.translations[0].translatedText,
+              }
+            });
+          }
+        }
       }
     } catch (error) {
       console.error("Error saving translations: ", error);
       throw error;
     }
   }
+
   async saveTranslationProduct(transplatedproducts) {
     console.log("translated products", transplatedproducts)
     try {
@@ -364,5 +375,19 @@ export default class Shop {
         return response;
       }
     }
+  }
+  async getProduct(productid) {
+    console.log("Product id is",productid)
+    await this.getShop();
+    if (this.shop) {
+      const product = await prisma.product.findMany({
+        where: {
+          productId: productid
+        }
+      })
+      console.log("data is this ",product)
+      return product
+    }
+
   }
 }

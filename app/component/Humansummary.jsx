@@ -65,7 +65,7 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
           initiateHumanTranslation(product.node.description, targetlanguages, 'product', product.node.id);
         });
       }
-      shopify.toast.show("Translating Your Page");
+      shopify.toast.show("Your order has been placed");
     }
     else {
       console.log("send to AI")

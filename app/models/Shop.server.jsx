@@ -218,7 +218,7 @@ export default class Shop {
       if (this.shop) {
         for (let page of pages) {
 
-          const existingPage = await prisma.page.findFirst({
+          const existingPage = await prisma.page.findMany({
             where: {
               pageId: page.id.toString(),
               language: page.language,
@@ -250,7 +250,7 @@ export default class Shop {
       if (this.shop) {
         for (let product of transplatedproducts) {
 
-          const existingProduct = await prisma.product.findFirst({
+          const existingProduct = await prisma.product.findMany({
             where: {
               productId: product.id.toString(),
               language: product.language,
@@ -295,7 +295,7 @@ export default class Shop {
     console.log("this is the shop", this.shop, pagetostore);
     let response;
     if (this.shop) {
-      const existingRecord = await prisma.humanPageStore.findFirst({
+      const existingRecord = await prisma.humanPageStore.findMany({
         where: {
           pageId: pagetostore.id.toString(),
           shop: this.shop.shop
@@ -338,7 +338,7 @@ export default class Shop {
     console.log("this is the shop", this.shop, producttostore);
     let response;
     if (this.shop) {
-      const existingRecord = await prisma.humanProductStore.findFirst({
+      const existingRecord = await prisma.humanProductStore.findMany({
         where: {
           productId: producttostore.id.toString(),
           shop: this.shop.shop

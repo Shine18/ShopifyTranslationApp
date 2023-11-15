@@ -19,7 +19,7 @@ import Product from "~/models/Products.server";
 import wordsCount from 'words-count';
 import { json } from "@remix-run/node";
 import { authenticate } from "../shopify.server";
-import { Link, useActionData, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
+import { Link, useActionData, useLoaderData, useLocation, useNavigate, useSubmit } from "@remix-run/react";
 import ShowPageword from '../component/Showpagewordcomponent'
 import componentstyles from "~/styles/summary.css";
 import pagewordcomponentstyles from "~/styles/showpageword.css";
@@ -40,6 +40,7 @@ export async function loader({ request }) {
   return json({
     shopurl: session.shop,
     products: fetchproduct.data.products.edges,
+    pageInfo: fetchproduct.data.products.pageInfo,
     fetchedlanguages: fetchedlanguages,
     getShop,
     WordsCount
@@ -48,10 +49,13 @@ export async function loader({ request }) {
 export async function action({ request }) {
   const { session, admin } = await authenticate.admin(request);
   const shop = new Shop(session.shop, admin.graphql);
-  const { totalWords, transplatedproducts, producttostore, action } = await request.json();
+  const products = new Product(session.shop, admin.graphql);
+  const { totalWords, transplatedproducts, producttostore, cursor, Prevcursor, action } = await request.json();
   let storeUsedWords;
   let translatedresponse;
   let storeproduct;
+  let moreproduct;
+  let prevProducts
   if (action === "TotalWordsCount") {
     storeUsedWords = await shop.addWordsUsage(totalWords);
   }
@@ -62,29 +66,60 @@ export async function action({ request }) {
   if (action === "store-product") {
     storeproduct = await shop.saveProductHumanTranslation(producttostore)
   }
+
+  if (action === "FetchMoreProducts") {
+    moreproduct = await products.getProductsCursor(cursor)
+  }
+  if (action === "FetchPrevProducts") {
+    prevProducts = await products.getPrevProducts(Prevcursor)
+  }
   return json({
     storeUsedWords,
     storeproduct,
-    translatedresponse
+    translatedresponse,
+    moreproduct,
+    prevProducts
   });
 }
 export default function showproduct() {
+  const submit = useSubmit();
   const location = useLocation();
   const actiondata = useActionData();
   const navigate = useNavigate();
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [checked, setChecked] = useState(false);
   const [nextclicked, setNextClicked] = useState(false);
-  const { shopurl, products, fetchedlanguages, getShop, WordsCount } = useLoaderData();
+  const { shopurl, products, pageInfo, fetchedlanguages, getShop, WordsCount } = useLoaderData();
   const [words, setWords] = useState(0);
-  const [selectedLanguages, setselectedLanguages] = useState([])
+  const [nextPage, setNextPage] = useState("");
+  const [cursor, setCursor] = useState("");
+  const [prevCursor, setPrevCursor] = useState("");
+  const [selectedLanguages, setselectedLanguages] = useState([]);
+  const [prods, setProducts] = useState([])
   const storedWordsResult = actiondata?.storeUsedWords;
   const storeproduct = actiondata?.storeproduct;
   const translatedresponse = actiondata?.translatedresponse
+  const newproducts = actiondata?.moreproduct
+  const prevProducts = actiondata?.prevProducts
   useEffect(() => {
     if (storeproduct === "Created new product record" || storeproduct === "Updated product record" || translatedresponse === "product translation uploaded")
       setNextClicked(false);
-  }, [storeproduct, translatedresponse]);
+    if (products) {
+      setProducts(products)
+    }
+    if (newproducts) {
+      setProducts(newproducts.data.products.edges);
+      setNextPage(newproducts.data.products.pageInfo.hasNextPage)
+      setCursor(newproducts.data.products.pageInfo.endCursor)
+      setPrevCursor(newproducts.data.products.pageInfo.startCursor)
+    }
+    if (prevProducts) {
+      setProducts(prevProducts.data.products.edges);
+      setNextPage(prevProducts.data.products.pageInfo.hasNextPage)
+      setCursor(prevProducts.data.products.pageInfo.endCursor)
+      setPrevCursor(prevProducts.data.products.pageInfo.startCursor)
+    }
+  }, [storeproduct, translatedresponse, products, newproducts, prevProducts]);
   const navigateTo = function (url) {
     open(url, "_blank");
   };
@@ -92,9 +127,16 @@ export default function showproduct() {
     console.log("list of products", selectedProducts)
   }, [selectedProducts])
   useEffect(() => {
+    console.log("page Info", pageInfo)
+    if (pageInfo) {
+      setNextPage(pageInfo.hasNextPage)
+      setCursor(pageInfo.endCursor)
+      setPrevCursor(pageInfo.startCursor)
+    }
     if (fetchedlanguages)
       setselectedLanguages(fetchedlanguages.TargetLanguagesCode.split(','))
-  }, [fetchedlanguages])
+  }, [fetchedlanguages, pageInfo])
+
   const selectProduct = function (product) {
     const productIndex = selectedProducts.findIndex((item) => item.node.id === product.node.id);
     if (productIndex === -1) {
@@ -115,11 +157,22 @@ export default function showproduct() {
     setChecked(newChecked);
 
     if (newChecked) {
-      setSelectedProducts(products);
+      setSelectedProducts(prods);
     } else {
       setSelectedProducts([]);
     }
-  }, [products]);
+  }, [prods]);
+  const fetchMoreProducts = () => {
+    if (nextPage) {
+      submit({ cursor: cursor, action: "FetchMoreProducts" },
+        { replace: true, method: "POST", encType: "application/json" })
+    }
+
+  }
+  const fetchPrevProducts = () => {
+    submit({ Prevcursor: prevCursor, action: "FetchPrevProducts" },
+      { replace: true, method: "POST", encType: "application/json" })
+  }
   return (
     <Page
       fullWidth>
@@ -157,7 +210,7 @@ export default function showproduct() {
           />
         </div>
         <div id="grid">
-          {products.map((product, key) => {
+          {prods.map((product, key) => {
             const selected = selectedProducts?.find(val => val.node.id === product.node.id) ? "Selected" : "Select";
             const outlined = selectedProducts?.find(val => val.node.id === product.node.id) ? true : false;
             console.log("Product is", selected)
@@ -169,7 +222,7 @@ export default function showproduct() {
                 secondaryAction={{
                   content: "View Product",
                   onAction: () => {
-                    const id = product.node.id.replace(/\D/g,'');
+                    const id = product.node.id.replace(/\D/g, '');
                     navigate(
                       `/app/${id}`
                     );
@@ -214,10 +267,12 @@ export default function showproduct() {
               hasPrevious
               onPrevious={() => {
                 console.log("Previous");
+                fetchPrevProducts()
               }}
               hasNext
               onNext={() => {
                 console.log("Next");
+                fetchMoreProducts()
               }}
             />
             <Button onClick={() => setNextClicked(true)} primary>Next</Button>

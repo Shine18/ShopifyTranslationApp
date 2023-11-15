@@ -302,10 +302,10 @@ export default class Shop {
         },
       });
 
-      if (existingRecord) {
+      if (existingRecord && existingRecord.length > 0) {
         const updatedPage = await prisma.humanPageStore.update({
           where: {
-            id: existingRecord.id,
+            id: existingRecord[0].id,
           },
           data: {
             shop: this.shop.shop,
@@ -313,6 +313,7 @@ export default class Shop {
             TargetLanguagesCode: pagetostore.targetlanguages.toString(),
             pageId: pagetostore.id.toString(),
             pageData: pagetostore.page,
+            pageTitle:pagetostore.pageTitle
           },
         });
         response = "Updated page record";
@@ -325,6 +326,7 @@ export default class Shop {
             TargetLanguagesCode: pagetostore.targetlanguages.toString(),
             pageId: pagetostore.id.toString(),
             pageData: pagetostore.page,
+            pageTitle:pagetostore.pageTitle
           },
         });
 
@@ -344,11 +346,11 @@ export default class Shop {
           shop: this.shop.shop
         },
       });
-
-      if (existingRecord) {
+      console.log("existing record is this ",existingRecord)
+      if (existingRecord && existingRecord.length > 0) {
         const updatedProduct = await prisma.humanProductStore.update({
           where: {
-            id: existingRecord.id,
+            id: existingRecord[0].id,
           },
           data: {
             shop: this.shop.shop,
@@ -356,6 +358,7 @@ export default class Shop {
             TargetLanguagesCode: producttostore.targetlanguages.toString(),
             productId: producttostore.id.toString(),
             productData: producttostore.product,
+            productTitle: producttostore.productTitle
           },
         });
         response = "Updated Product record";
@@ -368,6 +371,7 @@ export default class Shop {
             TargetLanguagesCode: producttostore.targetlanguages.toString(),
             productId: producttostore.id.toString(),
             productData: producttostore.product,
+            productTitle: producttostore.productTitle
           },
         });
 

@@ -61,6 +61,7 @@ model HumanPageStore {
   baseLanguageCode     String
   TargetLanguagesCode  String
   pageId               String
+  pageTitle            String
   pageData             String @db.LongText
 
 }
@@ -70,5 +71,26 @@ model HumanProductStore {
   baseLanguageCode        String
   TargetLanguagesCode     String
   productId               String
+  productTitle            String
   productData             String @db.LongText
+}
+model ProductOrder {
+  id                      Int @id @default(autoincrement())
+  shop                    String
+  productId               String
+  productTitle            String
+  languageCode            String
+  translation             String @db.LongText
+  markcomplete            Boolean
+
+}
+model PagectOrder {
+  id                      Int @id @default(autoincrement())
+  shop                    String
+  pageId                  String
+  pageTitle               String
+  languageCode            String
+  translation             String @db.LongText
+  markcomplete            Boolean
+
 }

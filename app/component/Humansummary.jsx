@@ -27,12 +27,13 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
     (newChecked) => setChecked(newChecked),
     [],
   );
-  const initiateHumanTranslation = (content, targetlanguages, item, itemid) => {
+  const initiateHumanTranslation = (content, targetlanguages, item, itemid, title) => {
     if (item === 'page') {
       const pagetostore = {
         page: content,
         targetlanguages: targetlanguages,
-        id: itemid
+        id: itemid,
+        pageTitle:title
       }
       console.log("pages to store is", pagetostore)
       submit({ pagetostore: pagetostore, action: "store-page" },
@@ -42,7 +43,8 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
       const producttostore = {
         product: content,
         targetlanguages: targetlanguages,
-        id: itemid
+        id: itemid,
+        productTitle:title
       }
       console.log("product to store is", producttostore)
       submit({ producttostore: producttostore, action: "store-product" },
@@ -53,8 +55,9 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
     if (translationmode[0] === "Human") {
       console.log("send it to human")
       if (pages) {
+        console.log("pages are",pages)
         pages.forEach((value) => {
-          initiateHumanTranslation(value.body_html, targetlanguages, 'page', value.id);
+          initiateHumanTranslation(value.body_html, targetlanguages, 'page', value.id, value.title);
         });
       }
 
@@ -62,7 +65,7 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
         console.log("these are products", products)
         products.forEach((product) => {
           console.log("single product", product)
-          initiateHumanTranslation(product.node.description, targetlanguages, 'product', product.node.id);
+          initiateHumanTranslation(product.node.description, targetlanguages, 'product', product.node.id, product.node.title);
         });
       }
       shopify.toast.show("Your order has been placed");

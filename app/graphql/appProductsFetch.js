@@ -1,7 +1,7 @@
-export function appProductsFetch() {
+export function appProductsFetch(cursor) {
   return `#graphql
  {
-  products(first:10) {
+  products(first:10,  after: $cursor) {
     edges {
       node {
         id,
@@ -15,6 +15,10 @@ export function appProductsFetch() {
           }
         }
       }
+      pageInfo {
+      hasNextPage
+      endCursor
+     }
     }
   }
 }`

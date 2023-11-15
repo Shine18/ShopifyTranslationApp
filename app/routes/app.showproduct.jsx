@@ -228,14 +228,11 @@ export default function showproduct() {
                     );
                   },
                 }}
-                primaryAction={{
-                  content: selected,
-                  onAction: () => {
-                    selectProduct(product);
-
-                  },
-                  outline: outlined
-                }}
+                description={<Checkbox
+                  label='Choose Product'
+                  checked={selectedProducts?.find(val => val.node.id === product.node.id)}
+                  onChange={() => selectProduct(product)}
+                />}
 
               >
                 <img

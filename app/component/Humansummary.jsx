@@ -27,35 +27,40 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
     (newChecked) => setChecked(newChecked),
     [],
   );
+  let pagesToStore = [];
+  let productsToStore = [];
   const initiateHumanTranslation = (content, targetlanguages, item, itemid, title) => {
     if (item === 'page') {
       const pagetostore = {
         page: content,
         targetlanguages: targetlanguages,
         id: itemid,
-        pageTitle:title
+        pageTitle: title
       }
       console.log("pages to store is", pagetostore)
-      submit({ pagetostore: pagetostore, action: "store-page" },
-        { replace: true, method: "POST", encType: "application/json" })
+      // submit({ pagetostore: pagetostore, action: "store-page" },
+      //   { replace: true, method: "POST", encType: "application/json" })
+      pagesToStore.push(pagetostore);
     }
     if (item === 'product') {
       const producttostore = {
         product: content,
         targetlanguages: targetlanguages,
         id: itemid,
-        productTitle:title
+        productTitle: title
       }
       console.log("product to store is", producttostore)
-      submit({ producttostore: producttostore, action: "store-product" },
-        { replace: true, method: "POST", encType: "application/json" })
+      productsToStore.push(producttostore);
+      // submit({ producttostore: producttostore, action: "store-product" },
+      //   { replace: true, method: "POST", encType: "application/json" })
     }
+
   }
   const addwords = useCallback(() => {
     if (translationmode[0] === "Human") {
       console.log("send it to human")
       if (pages) {
-        console.log("pages are",pages)
+        console.log("pages are", pages)
         pages.forEach((value) => {
           initiateHumanTranslation(value.body_html, targetlanguages, 'page', value.id, value.title);
         });
@@ -67,6 +72,13 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
           console.log("single product", product)
           initiateHumanTranslation(product.node.description, targetlanguages, 'product', product.node.id, product.node.title);
         });
+      }
+      if (pagesToStore.length) {
+        submit({ pagetostore: pagesToStore, action: "store-page" }, { replace: true, method: "POST", encType: "application/json" });
+      }
+
+      if (productsToStore.length) {
+        submit({ producttostore: productsToStore, action: "store-product" }, { replace: true, method: "POST", encType: "application/json" });
       }
       shopify.toast.show("Your order has been placed");
     }
@@ -125,7 +137,7 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
     }
   }
   const wrappingProducts = (id, language, data) => {
-    const newItem = {id, language, data};
+    const newItem = { id, language, data };
     setProductTranslations(prevItems => [...prevItems, newItem]);
   }
   useEffect(() => {
@@ -141,7 +153,7 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
       submit({ transplatedproducts: transplatedproducts, action: "saveTranslationProduct" },
         { replace: true, method: "POST", encType: "application/json" })
     }
-  }, [pagesTranslations, submit,productTranslations,productPage,translatonPage])
+  }, [pagesTranslations, submit, productTranslations, productPage, translatonPage])
   return (
     <Page>
       <Card>

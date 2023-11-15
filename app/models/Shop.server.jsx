@@ -290,98 +290,114 @@ export default class Shop {
         return null
     }
   }
-  async savePageHumanTranslation(pagetostore) {
+  async savePageHumanTranslation(pagesToStore) {
     await this.getShop();
-    console.log("this is the shop", this.shop, pagetostore);
+    console.log("this is the shop", this.shop, pagesToStore);
     let response;
-    if (this.shop) {
-      const existingRecord = await prisma.humanPageStore.findMany({
-        where: {
-          pageId: pagetostore.id.toString(),
-          shop: this.shop.shop
-        },
-      });
+    for (let pageToStore of pagesToStore) {
 
-      if (existingRecord && existingRecord.length > 0) {
-        const updatedPage = await prisma.humanPageStore.update({
+
+      if (this.shop) {
+        const existingRecord = await prisma.humanPageStore.findMany({
           where: {
-            id: existingRecord[0].id,
-          },
-          data: {
-            shop: this.shop.shop,
-            baseLanguageCode: this.shop.baseLanguageCode?.toString(),
-            TargetLanguagesCode: pagetostore.targetlanguages.toString(),
-            pageId: pagetostore.id.toString(),
-            pageData: pagetostore.page,
-            pageTitle:pagetostore.pageTitle
-          },
-        });
-        response = "Updated page record";
-        return response;
-      } else {
-        const newPage = await prisma.humanPageStore.create({
-          data: {
-            shop: this.shop.shop,
-            baseLanguageCode: this.shop.baseLanguageCode ? this.shop.baseLanguageCode?.toString() : "en-us",
-            TargetLanguagesCode: pagetostore.targetlanguages.toString(),
-            pageId: pagetostore.id.toString(),
-            pageData: pagetostore.page,
-            pageTitle:pagetostore.pageTitle
+            pageId: pageToStore.id.toString(),
+            shop: this.shop.shop
           },
         });
 
-        response = "Created new page record";
-        return response;
+        if (existingRecord && existingRecord.length > 0) {
+          const updatedPage = await prisma.humanPageStore.update({
+            where: {
+              id: existingRecord[0].id,
+            },
+            data: {
+              shop: this.shop.shop,
+              baseLanguageCode: this.shop.baseLanguageCode?.toString(),
+              TargetLanguagesCode: pageToStore.targetlanguages.toString(),
+              pageId: pageToStore.id.toString(),
+              pageData: pageToStore.page,
+              pageTitle: pageToStore.pageTitle
+            },
+          });
+
+          response = "Updated page record";
+          console.log(response);
+        } else {
+          const newPage = await prisma.humanPageStore.create({
+            data: {
+              shop: this.shop.shop,
+              baseLanguageCode: this.shop.baseLanguageCode ? this.shop.baseLanguageCode?.toString() : "en-us",
+              TargetLanguagesCode: pageToStore.targetlanguages.toString(),
+              pageId: pageToStore.id.toString(),
+              pageData: pageToStore.page,
+              pageTitle: pageToStore.pageTitle
+            },
+          });
+
+          response = "Created new page record";
+          console.log(response);
+        }
       }
     }
+    return  response;
   }
-  async saveProductHumanTranslation(producttostore) {
+
+  async saveProductHumanTranslation(productsToStore) {
     await this.getShop();
-    console.log("this is the shop", this.shop, producttostore);
+    console.log("this is the shop", this.shop, productsToStore);
     let response;
-    if (this.shop) {
-      const existingRecord = await prisma.humanProductStore.findMany({
-        where: {
-          productId: producttostore.id.toString(),
-          shop: this.shop.shop
-        },
-      });
-      console.log("existing record is this ",existingRecord)
-      if (existingRecord && existingRecord.length > 0) {
-        const updatedProduct = await prisma.humanProductStore.update({
+    for (let productToStore of productsToStore) {
+
+
+      if (this.shop) {
+        const existingRecord = await prisma.humanProductStore.findMany({
           where: {
-            id: existingRecord[0].id,
-          },
-          data: {
-            shop: this.shop.shop,
-            baseLanguageCode: this.shop.baseLanguageCode?.toString(),
-            TargetLanguagesCode: producttostore.targetlanguages.toString(),
-            productId: producttostore.id.toString(),
-            productData: producttostore.product,
-            productTitle: producttostore.productTitle
-          },
-        });
-        response = "Updated Product record";
-        return response;
-      } else {
-        const newPage = await prisma.humanProductStore.create({
-          data: {
-            shop: this.shop.shop,
-            baseLanguageCode: this.shop.baseLanguageCode ? this.shop.baseLanguageCode?.toString() : "en-us",
-            TargetLanguagesCode: producttostore.targetlanguages.toString(),
-            productId: producttostore.id.toString(),
-            productData: producttostore.product,
-            productTitle: producttostore.productTitle
+            productId: productToStore.id.toString(),
+            shop: this.shop.shop
           },
         });
 
-        response = "Created new product record";
-        return response;
+        console.log("existing record is this ", existingRecord)
+        if (existingRecord && existingRecord.length > 0) {
+          const updatedProduct = await prisma.humanProductStore.update({
+            where: {
+              id: existingRecord[0].id,
+            },
+            data: {
+              shop: this.shop.shop,
+              baseLanguageCode: this.shop.baseLanguageCode?.toString(),
+              TargetLanguagesCode: productToStore.targetlanguages.toString(),
+              productId: productToStore.id.toString(),
+              productData: productToStore.product,
+              productTitle: productToStore.productTitle
+            },
+          });
+
+          response = "Updated Product record";
+          console.log(response);
+
+        } else {
+          const newProduct = await prisma.humanProductStore.create({
+            data: {
+              shop: this.shop.shop,
+              baseLanguageCode: this.shop.baseLanguageCode ? this.shop.baseLanguageCode?.toString() : "en-us",
+              TargetLanguagesCode: productToStore.targetlanguages.toString(),
+              productId: productToStore.id.toString(),
+              productData: productToStore.product,
+              productTitle: productToStore.productTitle
+            },
+          });
+
+          response = "Created new product record";
+          console.log(response);
+        }
       }
     }
+    return response;
   }
+
   async getProduct(productid) {
-    console.log("Product id is",productid)
+    console.log("Product id is", productid)
     await this.getShop();
     if (this.shop) {
       const product = await prisma.product.findMany({
@@ -389,7 +405,7 @@ export default class Shop {
           productId: productid
         }
       })
-      console.log("data is this ",product)
+      console.log("data is this ", product)
       return product
     }
 

@@ -43,6 +43,7 @@ export default function Productdata() {
     console.log("product details",getProductDetails)
   },[getProductDetails])
   useEffect(() => {
+    console.log("saving")
     setProducts(getProduct)
   }, [getProduct])
   useEffect(() => {

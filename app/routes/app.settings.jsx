@@ -61,6 +61,7 @@ const settings = () => {
   const submit = useSubmit();
   const [selected, setSelected] = useState([]);
   const [selectedtwo, setSelectedtwo] = useState("Target language");
+  const [enableUpdate, setEnableUpdate] = useState(false);
   const [countryupdate, setCountryUpdate] = useState('');
   const [popoverActive, setPopoverActive] = useState(false);
   const [basePopoverActive, setBasePopoverActive] = useState(false);
@@ -115,14 +116,23 @@ const settings = () => {
     { label: "Russian", value: "ru" },
   ];
 
+  // const optionstwo = [
+  //   { label: "English (United States)", value: "en-us" },
+  //   { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
+  //   { label: "Russian", value: "ru" },
+  //   { label: "Chinese (Taiwan)", value: "zh-tw" },
+  //   { label: "French (Standard)", value: "fr" },
+  // ];
   const optionstwo = [
     { label: "English (United States)", value: "en-us" },
     { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
     { label: "Russian", value: "ru" },
     { label: "Chinese (Taiwan)", value: "zh-tw" },
     { label: "French (Standard)", value: "fr" },
-  ];
-
+  ].map((option) => ({
+    ...option,
+    disabled: selected.includes(option.value),
+  }));
   const storeLanguages = useCallback(() => {
     const baselanguage = selected;
     const targetlanguages = selectedOptions;
@@ -133,11 +143,22 @@ const settings = () => {
   }, [selectedOptions, selected, submit]);
   useEffect(() => {
 
-      if (storedResult) {
-        shopify.toast.show("Language Updated")
-      }
+    if (storedResult) {
+      shopify.toast.show("Language Updated")
+    }
 
   }, [storedResult])
+
+  useEffect(() => {
+    if (selected.length > 0 && selectedOptions.length > 0) {
+
+      setEnableUpdate(true);
+    }
+    else {
+
+      setEnableUpdate(false);
+    }
+  }, [selected, selectedOptions])
   return (
     <Page fullWidth>
       <Card>
@@ -265,7 +286,7 @@ const settings = () => {
 
               {selectedOptions.length > 0 && selected.length > 0 && (
                 <div id="nextbutton">
-                  <Button onClick={storeLanguages}>Update</Button>
+                  <Button disabled={!enableUpdate} onClick={storeLanguages}>Update</Button>
                 </div>
               )}
             </div>

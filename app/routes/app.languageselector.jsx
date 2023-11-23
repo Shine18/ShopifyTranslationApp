@@ -127,13 +127,23 @@ export default function languageselection() {
     { label: "Russian", value: "ru" },
   ];
 
+  // const optionstwo = [
+  //   { label: "English (United States)", value: "en-us" },
+  //   { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
+  //   { label: "Russian", value: "ru" },
+  //   { label: "Chinese (Taiwan)", value: "zh-tw" },
+  //   { label: "French (Standard)", value: "fr" },
+  // ];
   const optionstwo = [
     { label: "English (United States)", value: "en-us" },
     { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
     { label: "Russian", value: "ru" },
     { label: "Chinese (Taiwan)", value: "zh-tw" },
     { label: "French (Standard)", value: "fr" },
-  ];
+  ].map((option) => ({
+    ...option,
+    disabled: selected.includes(option.value),
+  }));
 
   const storeLanguages = useCallback(() => {
     const baselanguage = selected;

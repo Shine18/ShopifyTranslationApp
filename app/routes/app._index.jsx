@@ -63,7 +63,7 @@ export async function action({ request }) {
     storepage = await shop.savePageHumanTranslation(pagetostore);
   }
 
-  if( action === "getTrans") {
+  if (action === "getTrans") {
     return json({
       translated: await shop.getTranslatedPages()
     })
@@ -161,8 +161,8 @@ const showpageword = () => {
       setChoiceSelected((prev) => prev.filter((choice) => choice.id !== data.id));
     }
     console.log('calling server')
-    submit({  action: "getTrans" },
-        { replace: true, method: "POST", encType: "application/json" })
+    submit({ action: "getTrans" },
+      { replace: true, method: "POST", encType: "application/json" })
   };
   const translatePages = () => {
     setShowSummary(true);
@@ -180,7 +180,7 @@ const showpageword = () => {
     <Page
       fullWidth>
       {
-        showSummary ? <Humansummary translatonPage={true} translationmode={selectedMode} initiateRedirect={initiateRedirect} totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} pages={selectedPages} /> : <> <div style={{ height: '70px' }}>
+        showSummary ? <Humansummary translatonPage={true} translationmode={selectedMode} initiateRedirect={initiateRedirect} totalwords={words} targetlanguages={selectedLanguages} wordsUsed={getShop.wordsUsed} WordsCount={WordsCount} pages={selectedPages} /> : <> <div className="headset" style={{ height: '70px' }}>
           <Card>
             <div className='header-section'>
               <span className='back-arrow-container'>
@@ -250,13 +250,17 @@ const showpageword = () => {
                   }
                 </HorizontalStack>
 
-                <Text variant="headingMd" as="h1">
-                  Total words
-                </Text>
-                <div id="totalbutton">
+                <div className='wordcount'>
+                  <Text variant="headingMd" as="h1">
+                    Total words
+                  </Text>
                   <Text fontWeight="regular" variant="headingSm" as="p">
                     {words}
                   </Text>
+
+                </div>
+                <div id="totalbutton">
+
                   {isClicked ? (
                     ``
                   ) : (

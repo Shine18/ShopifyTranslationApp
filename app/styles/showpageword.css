@@ -55,11 +55,19 @@ span{
 .header-section{
   display:flex;
   flex-direction: row;
-  gap: 40px;
+  gap: 50px;
 }
 .back-arrow-container{
   border: solid 1px #CCCCCC;
   border-radius: 4px;
+  height: 30px;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  width: 30px;
+}
+.Polaris-Icon__Svg, .Polaris-Icon__Img{
+  fill: grey;
 }
 .Polaris-Box{
   margin-block: .5rem;
@@ -82,4 +90,21 @@ span{
 }
 .Language{
   font-size:18px;
+}
+.headset .Polaris-Box{
+  display: flex;
+  padding: 0 50px;
+  align-items: center;
+  height: 100%;
+}
+.wordcount{
+  display:flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.Polaris-RadioButton__Backdrop:before{
+  background-color: #007a5c !important;
+}
+.Polaris-RadioButton__Input:checked + .Polaris-RadioButton__Backdrop, .Polaris-RadioButton__ChoiceLabel:hover .Polaris-RadioButton__Input:checked + .Polaris-RadioButton__Backdrop {
+  border-color: #007a5c !important;
 }

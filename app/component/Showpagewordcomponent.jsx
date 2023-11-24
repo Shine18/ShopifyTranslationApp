@@ -71,14 +71,16 @@ const showpageword = ({ words, selectedLanguages, getShop, WordsCount, products,
                 }
               </div>
             </HorizontalStack>
-
-            <Text variant="headingMd" as="h1">
-              Total words
-            </Text>
-            <div id="totalbutton">
-              <Text fontWeight="regular" variant="headingSm" as="p">
-                {words}
+            <div className='wordcount'>
+              <Text variant="headingMd" as="h1">
+                Total words
               </Text>
+              <Text fontWeight="regular" variant="headingSm" as="p">
+                  {words}
+                </Text>
+              </div>
+            <div id="totalbutton">
+
               {isClicked ? (
                 ``
               ) : (

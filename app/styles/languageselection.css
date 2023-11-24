@@ -29,6 +29,7 @@
 }
 #nextbutton .Polaris-Button {
   background-color: #008060;
+  padding: 12px 40px;
   color: white;
 }
 .Polaris-Tag {
@@ -59,3 +60,10 @@
 #selectiondivs .Polaris-Button{
   border: none;
 }
+.Polaris-LegacyStack {
+  gap: 120px;
+}
+.Polaris-Icon__Svg, .Polaris-Icon__Img{
+  fill: grey;
+}
+

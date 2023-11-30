@@ -46,6 +46,7 @@ span{
 .navLinks{
   display: flex;
   gap: 20px;
+  align-items: center;
 }
 .navLinks a{
   text-decoration: none;
@@ -107,4 +108,26 @@ span{
 }
 .Polaris-RadioButton__Input:checked + .Polaris-RadioButton__Backdrop, .Polaris-RadioButton__ChoiceLabel:hover .Polaris-RadioButton__Input:checked + .Polaris-RadioButton__Backdrop {
   border-color: #007a5c !important;
+}
+.menu-container{
+  display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+.ai{
+  color: #1F64FF;
+font-size: 12px;
+font-style: normal;
+font-weight: 400;
+line-height: 12px;
+text-decoration: none;
+}
+.custom{
+  color: #008060;
+font-size: 12px;
+font-style: normal;
+font-weight: 400;
+text-decoration: none;
+line-height: 12px;
 }

@@ -82,8 +82,10 @@ export default function languageselection() {
     []
   );
   const handleChange = useCallback(
-    (selected) => setSelectedOptions(selected),
-    []
+    (selected) => {
+      setSelectedOptions(selected.filter(option => option !== selected));
+    },
+    [selected]
   );
 
   const activator = (
@@ -105,7 +107,12 @@ export default function languageselection() {
     [selectedOptions]
   );
 
-  const handleSelectChange = useCallback((value, d) => setSelected(value), []);
+  const handleSelectChange = useCallback(value => {
+    setSelected(value);
+    setSelectedOptions((selectedOptions) =>
+      selectedOptions.filter((option) => option !== value)
+    );
+  }, []);
 
   const optionsfour = [
     {

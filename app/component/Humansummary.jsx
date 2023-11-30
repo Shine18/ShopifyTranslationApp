@@ -120,6 +120,7 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
         .then(data => {
           console.log("page translated is ", data)
           if (format === 'html') {
+
             setPagesTranslations(oldTranslations => [...oldTranslations, { id, language, data }]);
           } else {
             wrappingProducts(id, language, data)
@@ -131,10 +132,8 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
         });
 
     }
-    console.log("initiating redirect..")
-    if (translatonPage) {
-      initiateRedirect(true)
-    }
+
+
   }
   const wrappingProducts = (id, language, data) => {
     const newItem = { id, language, data };
@@ -145,10 +144,13 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
     const transplatedproducts = productTranslations;
     console.log("translated data", translatedpages);
     console.log("translated data product", transplatedproducts);
+    console.log("translation bool", translatonPage)
     if (translatonPage) {
       submit({ translatedpages: translatedpages, action: "saveTranslation" },
         { replace: true, method: "POST", encType: "application/json" })
+
     }
+
     if (productPage) {
       submit({ transplatedproducts: transplatedproducts, action: "saveTranslationProduct" },
         { replace: true, method: "POST", encType: "application/json" })

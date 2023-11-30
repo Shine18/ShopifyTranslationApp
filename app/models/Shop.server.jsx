@@ -225,8 +225,7 @@ export default class Shop {
             }
           });
 
-
-          if (!existingPage) {
+          if (existingPage.length === 0) {
             await prisma.page.create({
               data: {
                 pageId: page.id.toString(),
@@ -234,14 +233,17 @@ export default class Shop {
                 translation: page.data.data.translations[0].translatedText,
               }
             });
+
           }
         }
+        return true
       }
     } catch (error) {
       console.error("Error saving translations: ", error);
       throw error;
     }
   }
+
 
   async saveTranslationProduct(transplatedproducts) {
     console.log("translated products", transplatedproducts)
@@ -258,7 +260,7 @@ export default class Shop {
           });
 
 
-          if (!existingProduct) {
+          if (existingProduct.length === 0) {
             await prisma.product.create({
               data: {
                 productId: product.id.toString(),
@@ -288,6 +290,18 @@ export default class Shop {
         return translatedpages
       else
         return null
+    }
+  }
+  async getCustomPageTranslations() {
+    await this.getShop()
+    if (this.shop) {
+      const translatedpages = await prisma.humanPageStore.findMany(
+        {
+          distinct: ["pageId"]
+        }
+      )
+      console.log("giving the result", translatedpages)
+      return translatedpages
     }
   }
   async savePageHumanTranslation(pagesToStore) {
@@ -339,7 +353,7 @@ export default class Shop {
         }
       }
     }
-    return  response;
+    return response;
   }
 
   async saveProductHumanTranslation(productsToStore) {
@@ -407,6 +421,61 @@ export default class Shop {
       })
       console.log("data is this ", product)
       return product
+    }
+
+  }
+  async productTranslations() {
+    await this.getShop();
+    console.log("this is the soppp", this.shop)
+    if (this.shop) {
+      const translatedproducts = await prisma.productOrder.findMany({
+        where: {
+          shop: this.shop.shop
+        }
+      })
+
+      return translatedproducts
+    }
+  }
+  async pageTranslations() {
+    await this.getShop();
+    console.log("this is the soppp", this.shop)
+    if (this.shop) {
+      const translatedpages = await prisma.pagectOrder.findMany({
+        where: {
+          shop: this.shop.shop
+        }
+      })
+      console.log("translated pages data", translatedpages)
+      return translatedpages
+    }
+  }
+  async getAITranslation(pageid) {
+    await this.getShop();
+    if (this.shop) {
+      console.log("Getting AI PAGe", pageid)
+      const pagedata = await prisma.page.findMany({
+        where:{
+          pageId:pageid
+        }
+      })
+
+      return pagedata
+    }
+
+  }
+  async getCustomTranslation(pageid) {
+    await this.getShop();
+    if (this.shop) {
+      console.log("Getting custom PAGe", pageid)
+      const pagedata = await prisma.pagectOrder.findMany({
+        where:{
+          pageId:pageid,
+          shop:this.shop.shop
+        }
+      })
+
+      return pagedata
     }
 
   }

@@ -90,7 +90,8 @@ model PagectOrder {
   pageId                  String
   pageTitle               String
   languageCode            String
-  translation             String @db.LongText
+  token                   String @db.LongText
+  tokenTranslation        String @db.LongText
   markcomplete            Boolean
 
 }

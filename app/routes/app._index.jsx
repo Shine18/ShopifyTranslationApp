@@ -257,6 +257,8 @@ const showpageword = () => {
                           onChange={(newChecked) => {
                             handleCheckboxChange(newChecked, data);
                           }}
+                          disabled={data.title === '/404' || data.title === '/blogs' || data.title === '/cart' || data.title === '/about'}
+
                         />
                         {translatedData &&
                           <Link

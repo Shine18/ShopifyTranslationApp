@@ -16,7 +16,15 @@ export const links = () => [
   { rel: "stylesheet", href: componentstyles },
   { rel: "stylesheet", href: pagewordcomponentstyles }
 ];
+export async function loader({ request }) {
+  const { session, admin } = await authenticate.admin(request);
+  const response = await admin.rest.get({ path: "/pages.json" });
+  const shopobj = new Shop(session.shop, admin.graphql);
 
+  const pages = await response.json();
+  const getShop = await shopobj.getShop();
+  return json({ pages, getShop });
+}
 export async function action({ request }) {
   const { session, admin } = await authenticate.admin(request);
   const shop = new Shop(session.shop, admin.graphql);
@@ -43,6 +51,18 @@ export default function Productdata() {
   const actiondata = useActionData();
   const type = actiondata?.type;
   const getpage = actiondata?.getpage;
+  const [aiSelectedLanguage, setAISelectedLanguage] = useState();
+  const [customSelectedLanguage, setCustomSelectedLanguage] = useState();
+  const { pages, getShop } = useLoaderData();
+  const [orignalPage, setOrignalPage] = useState('');
+  useEffect(() => {
+    console.log("basic language is", getShop.baseLanguageCode)
+    console.log("pages are ", pages.pages)
+    console.log(typeof parseInt(pageid))
+    const pageFound = pages.pages.find((val) => val.id === parseInt(pageid));
+    console.log("basic page is", pageFound.body_html)
+    setOrignalPage(pageFound.body_html)
+  }, [pages, getShop, pageid])
   useEffect(() => {
     console.log(pageid, pagetype)
     if (pagetype === "ai") {
@@ -64,6 +84,14 @@ export default function Productdata() {
     { label: "Chinese (Taiwan)", value: "zh-tw" },
     { label: "French (Standard)", value: "fr" },
   ];
+  useEffect(() => {
+    if (type === 'ai' && getpage && getpage[0]) {
+      setAISelectedLanguage(getpage[0].language);
+    }
+    if (type === 'custom' && getpage && getpage[0]) {
+      setCustomSelectedLanguage(getpage[0].languageCode);
+    }
+  }, [getpage, type]);
   return (
     <Page fullWidth>
       <div style={{ height: '70px' }}>
@@ -93,44 +121,132 @@ export default function Productdata() {
       </div>
       {
         type === 'ai' && getpage ?
-          (
-            getpage.map(page => {
-              let languageLabel = optionstwo.find(option => option.value === page.language)?.label;
+          <Card>
+            <div className="tagsdiv">
+              {getpage.map((page, index) => {
+                const languageLabel = optionstwo.find(option => option.value === page.language)?.label;
 
-              return (
-                <Card key={page.id}>
-                  <div className="pages-data">
-                    <h1 className='page-title'>{pagetitle}</h1>
-                    <p className='Language'>Language: {languageLabel}</p>
-                    <p className='html-data' dangerouslySetInnerHTML={{ __html: page.translation }} ></p>
-
+                return (
+                  <div
+                    key={index}
+                    style={{ background: aiSelectedLanguage === page.language ? '#008060' : '#858383', padding: '8px' }}
+                    className="tags"
+                    onClick={() => setAISelectedLanguage(page.language)}
+                  >
+                    {languageLabel}
                   </div>
-                </Card>
-              )
-            })
-          )
-          : null
-      }
-      {
-  type === 'custom' && getpage ?
-  (
-    getpage.map(page => {
-      let languageLabel = optionstwo.find(option => option.value === page.languageCode)?.label;
-
-      return(
-        <Card key={page.id}>
-            <div className="pages-data">
-              <h1 className='page-title'>{pagetitle}</h1>
-              <p className='Language'>Language: {languageLabel}</p>
-              <p className='html-data' dangerouslySetInnerHTML={{ __html: page.translation }} ></p>
-
+                );
+              })}
             </div>
-        </Card>
-      )
-    })
-  )
-  : null
-}
+
+            {
+              (() => {
+                let languageLabel = optionstwo.find(option => option.value === aiSelectedLanguage)?.label;
+                let baseLabel = optionstwo.find(option => option.value === getShop.baseLanguageCode)?.label;
+                return (
+                  <div className="title-language">
+                    <h1 className="page-title">{pagetitle}</h1>
+                    <div className="languagesitems">
+                      <span>{baseLabel}</span>
+                      <span> {languageLabel}</span>
+                    </div>
+                  </div>
+                );
+              })()
+            }
+
+            {
+              (() => {
+                const selectedPage = getpage.find(page => page.language === aiSelectedLanguage);
+                if (selectedPage) {
+                  let languageLabel = optionstwo.find(option => option.value === selectedPage.language)?.label;
+                  let baseLabel = optionstwo.find(option => option.value === getShop.baseLanguageCode)?.label;
+
+                  return (
+                    <div className="main-container">
+                      <div className="orignalpage">
+
+                        <p className="html-data" dangerouslySetInnerHTML={{ __html: orignalPage }}></p>
+                      </div>
+                      <div className="pages-data">
+
+                        <p className='html-data' dangerouslySetInnerHTML={{ __html: selectedPage.translation }} ></p>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()
+            }
+          </Card> : null
+      }
+
+      {
+        type === 'custom' && getpage && customSelectedLanguage ?
+          <Card>
+            <div className="tagsdiv">
+              {
+                Array.from(new Set(getpage.map(page => page.languageCode)))
+                  .map((langCode, index) => {
+                    const languageLabel = optionstwo.find(option => option.value === langCode)?.label;
+                    return (
+                      <div
+                        key={index}
+                        style={{ background: customSelectedLanguage === langCode ? '#008060' : '#858383', padding: '8px' }}
+                        className="tags"
+                        onClick={() => setCustomSelectedLanguage(langCode)}
+                      >
+                        {languageLabel}
+                      </div>
+                    );
+                  })
+              }
+            </div>
+
+            {
+              (() => {
+                let languageLabel = optionstwo.find(option => option.value === customSelectedLanguage)?.label;
+                let baseLabel = optionstwo.find(option => option.value === getShop.baseLanguageCode)?.label;
+                return (
+                  <div className="title-language">
+                    <h1 className="page-title">{pagetitle}</h1>
+                    <div className="languagesitems">
+                      <span>{baseLabel}</span>
+                      <span> {languageLabel}</span>
+                    </div>
+                  </div>
+                );
+              })()
+            }
+
+
+            {
+              (() => {
+                const selectedPages = getpage.filter(page => page.languageCode === customSelectedLanguage);
+                const uniquePages = selectedPages.filter((page, index, array) => array.findIndex(p => p.token === page.token) === index); // Remove duplicate tokens
+                if (uniquePages.length > 0) {
+
+                  return uniquePages.map((page, index) => (
+                    <div className="main-container" key={index}>
+                      <div className="orignalpage">
+
+                        <p className="html-data">{page.token}</p>
+                      </div>
+                      <div className="pages-data">
+
+                        <p className='html-data'>{page.tokenTranslation}</p>
+                      </div>
+                    </div>
+                  ));
+                }
+                return null;
+              })()
+            }
+          </Card> : null
+      }
+
+
+
 
 
     </Page>

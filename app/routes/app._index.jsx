@@ -58,6 +58,7 @@ export async function action({ request }) {
     storeUsedWords = await shop.addWordsUsage(totalWords);
   }
   if (action === "saveTranslation") {
+    console.log("saving the translations is hard",translatedpages)
     translatedresponse = await shop.saveTranslations(translatedpages);
   }
   if (action === "store-page") {

@@ -102,39 +102,45 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
 
   const executeTranslationAPI = async (text, languages, format, id) => {
     shopify.toast.show("Translating Your Page");
-    for (var language of languages) {
+
+    let translations = [];
+    let products = [];
+
+    for (let language of languages) {
       const params = {
         q: text,
         target: language,
-        format
+        format,
       };
 
-      await fetch('https://translation.googleapis.com/language/translate/v2?key=AIzaSyDA3RhXOeW-Rk-mexxxYHzYcaQD7FCTILE', {
+      let response = await fetch('https://translation.googleapis.com/language/translate/v2', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(params)
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log("page translated is ", data)
-          if (format === 'html') {
+        body: JSON.stringify(params),
+      });
 
-            setPagesTranslations(oldTranslations => [...oldTranslations, { id, language, data }]);
-          } else {
-            wrappingProducts(id, language, data)
-          }
+      let data = await response.json();
 
-        })
-        .catch((error) => {
-          console.error('Failed to translate:', error);
-        });
+      if (format === 'html') {
+        translations.push({ id, language, data });
+      } else {
+        products.push(wrappingProducts(id, language, data));
+      }
+
+      console.log("page translated is ", data);
+      console.log("overall Data", data, language, id);
 
     }
 
+    // Update the state at the end:
+    setPagesTranslations(oldTranslations => [...oldTranslations, ...translations]);
 
+    // assuming this returns a promise
+    await Promise.all(products);
   }
+
   const wrappingProducts = (id, language, data) => {
     const newItem = { id, language, data };
     setProductTranslations(prevItems => [...prevItems, newItem]);

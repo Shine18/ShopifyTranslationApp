@@ -113,7 +113,7 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
         format,
       };
 
-      let response = await fetch('https://translation.googleapis.com/language/translate/v2', {
+      let response = await fetch('https://translation.googleapis.com/language/translate/v2?key=AIzaSyBHy7gpuKDGp1Tg1nqIzNb_-h72uiyODQc', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

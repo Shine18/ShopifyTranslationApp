@@ -1,13 +1,10 @@
 import {
   Card,
-  Text,
   Checkbox,
   Pagination,
   Page,
   Button,
   MediaCard,
-  TopBar,
-  Frame,
   Icon
 } from "@shopify/polaris";
 import {
@@ -89,18 +86,18 @@ export default function showproduct() {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [checked, setChecked] = useState(false);
   const [nextclicked, setNextClicked] = useState(false);
-  const { shopurl, products, pageInfo, fetchedlanguages, getShop, WordsCount } = useLoaderData();
+  const { products, pageInfo, fetchedlanguages, getShop, WordsCount } = useLoaderData();
   const [words, setWords] = useState(0);
   const [nextPage, setNextPage] = useState("");
   const [cursor, setCursor] = useState("");
   const [prevCursor, setPrevCursor] = useState("");
   const [selectedLanguages, setselectedLanguages] = useState([]);
   const [prods, setProducts] = useState([])
-  const storedWordsResult = actiondata?.storeUsedWords;
   const storeproduct = actiondata?.storeproduct;
   const translatedresponse = actiondata?.translatedresponse
   const newproducts = actiondata?.moreproduct
   const prevProducts = actiondata?.prevProducts
+  // feting products from loader checking if product is stored in db setting pointers for gql and setting new fetch products
   useEffect(() => {
     if (storeproduct === "Created new product record" || storeproduct === "Updated product record" || translatedresponse === "product translation uploaded")
       setNextClicked(false);
@@ -120,12 +117,7 @@ export default function showproduct() {
       setPrevCursor(prevProducts.data.products.pageInfo.startCursor)
     }
   }, [storeproduct, translatedresponse, products, newproducts, prevProducts]);
-  const navigateTo = function (url) {
-    open(url, "_blank");
-  };
-  useEffect(() => {
-    console.log("list of products", selectedProducts)
-  }, [selectedProducts])
+
   useEffect(() => {
     console.log("page Info", pageInfo)
     if (pageInfo) {
@@ -136,7 +128,7 @@ export default function showproduct() {
     if (fetchedlanguages)
       setselectedLanguages(fetchedlanguages.TargetLanguagesCode.split(','))
   }, [fetchedlanguages, pageInfo])
-
+// set selected product from list
   const selectProduct = function (product) {
     const productIndex = selectedProducts.findIndex((item) => item.node.id === product.node.id);
     if (productIndex === -1) {
@@ -153,6 +145,7 @@ export default function showproduct() {
       setWords(words => words - calculatedWords);
     }
   };
+  // selectin/unselecting all products
   const handleChange = useCallback((newChecked) => {
     setChecked(newChecked);
 
@@ -162,6 +155,7 @@ export default function showproduct() {
       setSelectedProducts([]);
     }
   }, [prods]);
+  // products pagination
   const fetchMoreProducts = () => {
     if (nextPage) {
       submit({ cursor: cursor, action: "FetchMoreProducts" },
@@ -211,9 +205,7 @@ export default function showproduct() {
         </div>
         <div id="grid">
           {prods.map((product, key) => {
-            const selected = selectedProducts?.find(val => val.node.id === product.node.id) ? "Selected" : "Select";
-            const outlined = selectedProducts?.find(val => val.node.id === product.node.id) ? true : false;
-            console.log("Product is", selected)
+
             return (
               <MediaCard
                 key={key}

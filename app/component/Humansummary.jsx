@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react'
-import { DataTable, Card, Text, Checkbox, IndexTable, Page, Badge, Tag, HorizontalStack, VerticalStack, Button, ChoiceList } from "@shopify/polaris";
+import { DataTable, Card, Text, Checkbox,  Page,  Tag, HorizontalStack,  Button } from "@shopify/polaris";
 import { useState, useCallback } from 'react';
-import { useActionData, useSubmit } from '@remix-run/react';
+import {  useSubmit } from '@remix-run/react';
 const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products = [], pages = [], translationmode, initiateRedirect, translatonPage = false, productPage = false }) => {
-  const actiondata = useActionData();
   const submit = useSubmit();
   const [checked, setChecked] = useState(false);
   const [productTranslations, setProductTranslations] = useState([]);
   const [pagesTranslations, setPagesTranslations] = useState([]);
-  const storedWordsResult = actiondata?.storeUsedWords;
   const optionstwo = [
     { label: "English (United States)", value: "en-us" },
     { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
@@ -29,6 +27,7 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
   );
   let pagesToStore = [];
   let productsToStore = [];
+  // saving to db for custom translation
   const initiateHumanTranslation = (content, targetlanguages, item, itemid, title) => {
     if (item === 'page') {
       const pagetostore = {
@@ -56,20 +55,17 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
     }
 
   }
+  // translation callback
   const addwords = useCallback(() => {
     if (translationmode[0] === "Human") {
-      console.log("send it to human")
       if (pages) {
-        console.log("pages are", pages)
         pages.forEach((value) => {
           initiateHumanTranslation(value.body_html, targetlanguages, 'page', value.id, value.title);
         });
       }
 
       if (products) {
-        console.log("these are products", products)
         products.forEach((product) => {
-          console.log("single product", product)
           initiateHumanTranslation(product.node.description, targetlanguages, 'product', product.node.id, product.node.title);
         });
       }
@@ -100,6 +96,7 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
     }
   }, [submit, totalWordCount, pages, products, targetlanguages, translationmode])
 
+  // translation via google
   const executeTranslationAPI = async (text, languages, format, id) => {
     shopify.toast.show("Translating Your Page");
 
@@ -128,10 +125,6 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
       } else {
         products.push(wrappingProducts(id, language, data));
       }
-
-      console.log("page translated is ", data);
-      console.log("overall Data", data, language, id);
-
     }
 
     // Update the state at the end:
@@ -145,12 +138,10 @@ const summary = ({ totalwords, targetlanguages, wordsUsed, WordsCount, products 
     const newItem = { id, language, data };
     setProductTranslations(prevItems => [...prevItems, newItem]);
   }
+  // after translating via google api saving to db
   useEffect(() => {
     const translatedpages = pagesTranslations;
     const transplatedproducts = productTranslations;
-    console.log("translated data", translatedpages);
-    console.log("translated data product", transplatedproducts);
-    console.log("translation bool", translatonPage)
     if (translatonPage) {
       submit({ translatedpages: translatedpages, action: "saveTranslation" },
         { replace: true, method: "POST", encType: "application/json" })

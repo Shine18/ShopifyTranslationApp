@@ -2,17 +2,12 @@ import React, { useEffect } from 'react';
 import {
   Card,
   Text,
-  IndexTable,
   Page,
-  Badge,
   Tag,
   HorizontalStack,
-  VerticalStack,
   Button,
   ChoiceList,
   Checkbox,
-  Frame,
-  TopBar,
   Grid,
   Icon
 } from "@shopify/polaris";
@@ -23,8 +18,8 @@ import Humansummary from "~/component/Humansummary";
 import styles from "~/styles/showpageword.css";
 import { useState, useCallback } from "react";
 import { authenticate } from "~/shopify.server";
-import { json, redirect } from "@remix-run/node";
-import { Link, Links, useActionData, useLoaderData, useLocation, useNavigate, useSubmit } from "@remix-run/react";
+import { json } from "@remix-run/node";
+import { Link, useActionData, useLoaderData, useLocation, useNavigate, useSubmit } from "@remix-run/react";
 import { stripHtml } from "string-strip-html";
 import wordsCount from 'words-count';
 import Shop from '~/models/Shop.server';
@@ -43,7 +38,6 @@ export async function loader({ request }) {
   const pages = await response.json();
   const getShop = await shopobj.getShop();
   const WordsCount = await shopobj.getPlansWordCount();
-  console.log("custom data comming", custompagetranslations)
   return json({ pages, fetchedlanguages, getShop, WordsCount, translatedPages, custompagetranslations });
 }
 export async function action({ request }) {
@@ -53,12 +47,11 @@ export async function action({ request }) {
   let storeUsedWords;
   let translatedresponse;
   let storepage;
-  console.log('action called', action)
   if (action === "TotalWordsCount") {
     storeUsedWords = await shop.addWordsUsage(totalWords);
   }
   if (action === "saveTranslation") {
-    console.log("saving the translations is hard",translatedpages)
+    console.log("saving the translations is hard", translatedpages)
     translatedresponse = await shop.saveTranslations(translatedpages);
   }
   if (action === "store-page") {
@@ -80,14 +73,11 @@ const showpageword = () => {
 
   const submit = useSubmit();
   const location = useLocation();
-  const navigate = useNavigate();
   const { pages, fetchedlanguages, getShop, WordsCount, translatedPages, custompagetranslations } = useLoaderData();
   const [prevPages, setPrevPages] = useState(translatedPages);
   const actiondata = useActionData();
-  const storedWordsResult = actiondata?.storeUsedWords;
   const storepage = actiondata?.storepage;
   const translated = actiondata?.translated
-  const translatedresponse = actiondata?.translatedresponse
   const [selected, setSelected] = useState([""]);
   const [selectedPages, setSelectedPages] = useState([]);
   const [selectedMode, setSelectedMode] = useState("");
@@ -96,22 +86,12 @@ const showpageword = () => {
   const [showSummary, setShowSummary] = useState(false);
   const [storeTranlatedData, setStoreTranslatedData] = useState([])
   const [words, setWords] = useState(0)
-
-  const [translatedPages2, setTranslatedPages2] = useState(translatedPages)
-
+  // setting translation type
   const handleChange = useCallback((value) => {
     setSecondClicked(true);
     setSelected(value);
     setSelectedMode(value);
   }, []);
-
-  useEffect(() => {
-    console.log("getting translations", translated)
-    setTranslatedPages2(translated)
-  }, [translated])
-  useEffect(() => {
-    console.log(selectedMode)
-  }, [selectedMode]);
   useEffect(() => {
     if (translatedPages.length != prevPages.length || storepage === "Created new page record" || storepage === "Updated page record") {
       setPrevPages(translatedPages);
@@ -140,10 +120,6 @@ const showpageword = () => {
       });
     }
   }, [translatedPages, custompagetranslations]);
-
-  useEffect(() => {
-    console.log("dataaaaaa", storeTranlatedData)
-  }, [storeTranlatedData])
   const optionstwo = [
     { label: "English (United States)", value: "en-us" },
     { label: "Arabic (Saudi Arabia)", value: "ar-sa" },
@@ -163,7 +139,6 @@ const showpageword = () => {
     { title: '/cart', id: 3 },
     ...pages.pages.map(page => ({ title: '/' + page.title.toString().toLowerCase(), id: page.id }))
   ];
-  const handleSelectChange = (newSelected) => { console.log(newSelected) }
   useEffect(() => {
     let totalWords = 0;
     choiceSelected.map((value) => {
@@ -178,9 +153,7 @@ const showpageword = () => {
     });
     setWords(totalWords);
   }, [choiceSelected]);
-  useEffect(() => {
-    console.log(selectedPages)
-  }, [selectedPages])
+  // selecting page callback
   const handleCheckboxChange = (newChecked, data) => {
     if (newChecked) {
       setChoiceSelected((prev) => [...prev, data]);
@@ -191,13 +164,12 @@ const showpageword = () => {
       setSelectedPages((prev) => prev.filter((page) => page.id !== pageFound.id));
       setChoiceSelected((prev) => prev.filter((choice) => choice.id !== data.id));
     }
-    console.log('calling server')
     submit({ action: "getTrans" },
       { replace: true, method: "POST", encType: "application/json" })
   };
+  // translation summary component
   const translatePages = () => {
     setShowSummary(true);
-    console.log("i am being clicked");
   };
   const initiateRedirect = (val) => {
     if (val) {
@@ -368,30 +340,7 @@ const showpageword = () => {
             </Grid.Cell>
           </Grid></>
       }
-      {!showSummary ?
-        translatedPages2 && translatedPages2.length > 0 && (
-          translatedPages2.map(translatedPage => {
-            const page = pages.pages.find(page => page.id.toString() === translatedPage.pageId.toString());
-            if (selectedPages.some(selectedPage => selectedPage.id === page.id)) {
-              console.log("current page", page, "current translatedPage", translatedPage);
 
-              return (
-                <Card key={translatedPage.id}>
-                  <div className="pages-data">
-                    <h1 className='page-title'>{page.title}</h1>
-                    <p className='Language'>Language: {translatedPage.language}</p>
-                    <p className='html-data' dangerouslySetInnerHTML={{ __html: translatedPage.translation }} ></p>
-                    <Button>Show more</Button>
-                  </div>
-                </Card>
-              );
-            } else {
-              return null;
-            }
-          })
-        )
-        : ""
-      }
     </Page>
   );
 };
